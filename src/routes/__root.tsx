@@ -59,6 +59,7 @@ export const Route = createRootRoute({
         <div className="flex ">
           {!hideHeader && <SidebarDs />}
           <Outlet />
+          
         </div>
 
         <TanStackRouterDevtools />

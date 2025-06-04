@@ -40,13 +40,28 @@ function RouteComponent() {
       id: 1,
       name: "Cabai",
       land: "Lahan 1",
-      image: "/chili.jpg",
+      image: "/cabe.png",
       description:
         "Jenis tanaman hortikultura yang memiliki nilai ekonomis tinggi dan banyak dibudidayakan secara komersial. Cabai merah cocok dibudidayakan, baik di dataran rendah maupun dataran tinggi, pada lahan sawah atau tegalan dengan ketinggian 0-1000m dpl.",
     },
-    // More plant details would go here
+    {
+      id: 2,
+      name: "Anggur",
+      land: "Lahan 2",
+      image: "/anggur.png",
+      description:
+        "Anggur adalah tanaman buah yang tumbuh merambat, cocok ditanam di iklim sedang dan tropis. Anggur memiliki nilai ekonomis tinggi dan banyak dibudidayakan secara komersial.",
+    },
+    {
+      id: 3,
+      name: "Tomat",
+      land: "Lahan 3",
+      image: "/tomat.png",
+      description:
+        "Tomat adalah tanaman sayuran yang kaya akan vitamin dan mudah dibudidayakan. Tomat dapat tumbuh baik di berbagai jenis tanah dengan perawatan yang tepat.",
+    },
   ]
-const plugin = useRef(
+  const plugin = useRef(
     Autoplay({ delay: 2000, stopOnInteraction: true })
   )
 
@@ -141,41 +156,32 @@ const plugin = useRef(
               onMouseLeave={plugin.current.reset}
             >
               <CarouselContent>
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <CarouselItem key={index}>
+                {plantDetails.map((plant) => (
+                  <CarouselItem key={plant.id}>
                     <div className="flex justify-center items-center gap-4 h-[40vh]">
-
-                      <Card className="bg-white rounded-lg shadow-sm w-[65%] h-full">
-                        <CardContent className="p-0">
-                          <div className="relative">
-
-                            <div className="overflow-hidden">
-                              <img src="/chili.jpg" alt="Cabai" className="w-full h-36 object-cover" />
-                            </div>
-
+                      {/* Tanaman Card */}
+                      <Card className="bg-white overflow-hidden shadow-lg rounded-lg w-full h-full">
+                        <div className="h-full flex flex-col ">
+                          {/* Gambar */}
+                          <div className="h-48 w-full overflow-hidden px-4">
+                            <img
+                              src={plant.image}
+                              alt={plant.name}
+                              className="w-full h-full object-cover rounded-2xl "
+                            />
                           </div>
-                          <div className="p-4">
-                            <h3 className="text-lg font-medium mb-1">Cabai</h3>
-                            <p className="text-sm text-gray-500 mb-2">Lahan 1</p>
-                            <p className="text-sm text-gray-700">
-                              Jenis tanaman hortikultura yang memiliki nilai ekonomis tinggi dan banyak dibudidayakan secara
-                              komersial. Cabai merah cocok dibudidayakan, baik di dataran rendah maupun dataran tinggi, pada lahan
-                              sawah atau tegalan dengan ketinggian 0-1000m dpl.
-                            </p>
+
+                          {/* Deskripsi */}
+                          <div className="p-4 flex-1">
+                            <h3 className="text-lg font-medium mb-1">{plant.name}</h3>
+                            <p className="text-sm text-gray-500 mb-2">{plant.land}</p>
+                            <p className="text-sm text-gray-700 line-clamp-4">{plant.description}</p>
                           </div>
-                          {/* <div className="flex justify-center pb-2">
-                      {plantDetails.map((_, index) => (
-                        <div
-                          key={index}
-                          className={`h-2 w-2 rounded-full mx-1 ${index === activePage ? "bg-[#1a472a]" : "bg-gray-300"}`}
-                        />
-                      ))}
-                    </div> */}
-                        </CardContent>
+                        </div>
                       </Card>
 
-                      {/* Planting phase section */}
-                      <Card className="bg-white rounded-lg shadow-sm w-[45%] h-full">
+                      {/* Fase Tanam */}
+                      <Card className="bg-white rounded-lg shadow-lg w-[45%] h-full">
                         <CardHeader className="pb-2">
                           <CardTitle className="text-lg font-medium">Fase Tanam</CardTitle>
                           <p className="text-xs text-gray-500">this month</p>
@@ -187,15 +193,13 @@ const plugin = useRef(
                                 <div className="mr-3 relative">
                                   <div
                                     className={`h-6 w-6 rounded-full flex items-center justify-center z-10 relative ${phase.status === "success"
-                                      ? "bg-green-500"
-                                      : phase.status === "warning"
-                                        ? "bg-yellow-500"
-                                        : "bg-red-500"
+                                        ? "bg-green-500"
+                                        : phase.status === "warning"
+                                          ? "bg-yellow-500"
+                                          : "bg-red-500"
                                       }`}
                                   >
-                                    {phase.status === "success" && <div className="h-3 w-3 bg-white rounded-full" />}
-                                    {phase.status === "warning" && <div className="h-3 w-3 bg-white rounded-full" />}
-                                    {phase.status === "error" && <div className="h-3 w-3 bg-white rounded-full" />}
+                                    <div className="h-3 w-3 bg-white rounded-full" />
                                   </div>
                                   {index < plantingPhases.length - 1 && (
                                     <div className="absolute top-6 left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-gray-200 z-0" />
@@ -210,7 +214,6 @@ const plugin = useRef(
                           </div>
                         </CardContent>
                       </Card>
-
                     </div>
                   </CarouselItem>
                 ))}

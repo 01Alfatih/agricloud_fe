@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from 'react'
 
@@ -22,8 +22,7 @@ function RouteComponent() {
         <div className="w-full max-w-md">
           {/* Logo */}
           <div className="flex justify-center items-center mb-8">
-            <img src="" alt="" className='bg-gray-400 h-20 w-40'/>
-            <span className="text-3xl font-semibold text-[#1B4332]">AgriCloud</span>
+            <img src="/logo.png" alt="" className='' />
           </div>
 
           {/* Heading */}
@@ -75,9 +74,7 @@ function RouteComponent() {
 
             <div className="text-center text-sm">
               <span className="text-gray-500">Belum memiliki akun? </span>
-              <a href="#" className="text-[#2D6A4F] font-medium">
-                Sign up
-              </a>
+              <Link to='/register' className="text-[#2D6A4F] font-medium" >Sign up</Link>
             </div>
           </form>
         </div>
@@ -85,13 +82,10 @@ function RouteComponent() {
 
       {/* Right side - Image */}
       <div
-        className="h-[80%] hidden lg:block lg:w-1/2 bg-cover bg-center rounded-bl-2xl"
-        
-        style={{
-          backgroundImage:
-            "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-60VaBInt6d7Pi8Hi4JLCeXWBuAC7qO.png')",
-        }}
-      ></div>
+        className="h-[80%] hidden lg:block lg:w-1/2 bg-cover "
+      >
+        <img src="/login.png" alt="" className='w-full h-full bg-cover object-cover rounded-bl-2xl' />
+      </div>
     </div>
   )
 }

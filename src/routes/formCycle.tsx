@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Cloud, Leaf } from "lucide-react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,16 +14,12 @@ function RouteComponent() {
   <div
       className="min-h-screen w-full bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center p-4"
       style={{
-        backgroundImage: "url('https://cdn.antaranews.com/cache/1200x800/2022/01/26/IMG_20211107_070110.jpg')",
+        backgroundImage: "url('/form.png')",
       }}
     >
       {/* Logo */}
       <div className="flex items-center gap-2 mb-8">
-        <div className="relative">
-          <Cloud className="w-12 h-12 text-white" />
-          <Leaf className="w-6 h-6 text-white absolute top-2 left-3" />
-        </div>
-        <h1 className="text-white text-4xl font-light">AgriCloud</h1>
+        <img src="/logo1.png" alt="" className='w-xs'/>
       </div>
 
       {/* Form Card */}

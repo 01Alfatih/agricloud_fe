@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link , createFileRoute } from '@tanstack/react-router'
 import { useState } from "react"
 import { Apple, Eye, EyeOff, Facebook } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -15,7 +15,7 @@ function RouteComponent() {
   return (
     <div className='h-screen w-full'>
       <div className="min-h-screen items-center justify-center bg-slate-100 p-4 h-screen relative">
-        <img src="https://placehold.co/600x400" alt="" className=' w-full h-[50%] object-cover' />
+        <img src="/div.banner-thumb.png" alt="" className=' w-full h-[50%] object-cover rounded-2xl' />
         <div className="flex flex-1 flex-col ">
           <div className="w-full max-w-md">
             <div className="mb-8 text-center absolute top-25  left-1/2 -translate-x-1/2">
@@ -108,14 +108,13 @@ function RouteComponent() {
 
                 <div className="mt-4 text-center text-sm text-gray-500">
                   Already have an account?{" "}
-                  <a href="#" className="text-green-600 hover:underline">
-                    Sign in
-                  </a>
+                  <Link to='/login' className="text-green-600 hover:underline">Sign in</Link>
                 </div>
               </form>
             </div>
           </div>
         </div>
-      </div></div>
+      </div>
+    </div>
   )
 }

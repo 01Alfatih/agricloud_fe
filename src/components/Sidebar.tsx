@@ -36,13 +36,7 @@ export function SidebarDs() {
         <div className="fixed inset-y-0 left-0 w-[280px] bg-[#0B4619] text-white flex flex-col rounded-r-2xl ">
             {/* Logo */}
             <div className="p-6 flex items-center gap-2">
-                <svg viewBox="0 0 24 24" className="h-6 w-6 fill-white" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22 17.5C22 19.9853 19.9853 22 17.5 22C15.0147 22 13 19.9853 13 17.5C13 15.0147 15.0147 13 17.5 13C19.9853 13 22 15.0147 22 17.5Z" />
-                    <path d="M15 6.5C15 8.98528 12.9853 11 10.5 11C8.01472 11 6 8.98528 6 6.5C6 4.01472 8.01472 2 10.5 2C12.9853 2 15 4.01472 15 6.5Z" />
-                    <path d="M11 17.5C11 14.4624 13.4624 12 16.5 12C19.5376 12 22 14.4624 22 17.5C22 20.5376 19.5376 23 16.5 23C13.4624 23 11 20.5376 11 17.5Z" />
-                    <path d="M2 17.5C2 15.0147 4.01472 13 6.5 13C8.98528 13 11 15.0147 11 17.5C11 19.9853 8.98528 22 6.5 22C4.01472 22 2 19.9853 2 17.5Z" />
-                </svg>
-                <span className="text-xl font-semibold">AgriCloud</span>
+                <img src="/public/logo1.png" alt="AgriCloud" />
             </div>
 
             {/* Navigation */}

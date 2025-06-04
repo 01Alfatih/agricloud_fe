@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link , createFileRoute} from '@tanstack/react-router'
 import { Plus, Search } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -13,19 +13,19 @@ export const Route = createFileRoute('/cycle')({
 const plants = [
   {
     name: "Cabai",
-    image: "/images/cabai.jpg",
+    image: "/cabe1.png",
     progress: 60,
     description: "Cabai adalah tanaman hortikultura bernilai ekonomis tinggi.",
   },
   {
     name: "Anggur",
-    image: "/images/anggur.jpg",
+    image: "/anggur1.png",
     progress: 60,
     description: "Anggur cocok ditanam di iklim sedang dan tropis.",
   },
   {
     name: "Tomat",
-    image: "/images/tomat.jpg",
+    image: "/tomat1.png",
     progress: 40,
     description: "Tomat kaya akan vitamin dan mudah dibudidayakan.",
   },
@@ -36,7 +36,7 @@ function RouteComponent() {
 
   return (
     <div className='h-screen w-full relative'>
-      <img src="https://placehold.co/600x400" alt="" className=' w-full h-[50%] object-cover' />
+      <img src="/bg-dashboard.png" alt="" className=' w-full h-[50%] object-cover' />
 
       <div className="container mx-auto px-4 py-8">
         {/* Search Bar */}
@@ -83,13 +83,16 @@ function RouteComponent() {
                       <h3 className="font-medium mb-1">{plant.name}</h3>
                       <p className="text-xs text-gray-500 mb-2">{plant.description}</p>
                       <div className="flex items-center justify-between mt-2">
+                        <Link to="/dCycle">
                         <Button
                           variant="outline"
                           size="sm"
+                          
                           className="text-xs h-8 px-4 rounded-full border-gray-300"
                         >
                           LIHAT
                         </Button>
+                        </Link>
                         <Progress value={plant.progress} className="w-16 h-1.5" />
                       </div>
                     </CardContent>

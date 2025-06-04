@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { MapPin, MoreHorizontal, Plus, Search, Square, User, } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,7 +17,7 @@ export const Route = createFileRoute('/field')({
       owner: "Agung P",
       location: "Brebes",
       area: "5 Hektar",
-      image: "/placeholder.svg?height=200&width=300",
+      image: "/lahan.png",
     },
     {
       id: 2,
@@ -27,7 +27,7 @@ export const Route = createFileRoute('/field')({
       owner: "Agung P",
       location: "Brebes",
       area: "5 Hektar",
-      image: "/placeholder.svg?height=200&width=300",
+      image: "/lahan.png",
     },
     {
       id: 3,
@@ -37,7 +37,7 @@ export const Route = createFileRoute('/field')({
       owner: "Agung P",
       location: "Brebes",
       area: "5 Hektar",
-      image: "/placeholder.svg?height=200&width=300",
+      image: "/lahan.png",
     },
   ]
 
@@ -47,11 +47,11 @@ function RouteComponent() {
   return (
     <div className='h-screen w-full relative'>
       {/* Header Image */}
-      <img src="https://placehold.co/600x400" alt="" className='w-full h-[50%] object-cover' />
+      <img src="/bg-dashboard.png" alt="" className='w-full h-[50%] object-cover' />
 
       <div className="container mx-auto px-4 py-8">
         {/* Search Bar */}
-        <div className="absolute top-15 left-1/2 transform -translate-x-1/2">
+        <div className="absolute top-15 left-[80%] transform -translate-x-1/4">
           <div className="flex justify-end-safe mb-8">
             <div className="relative w-full max-w-md md:max-w-xl">
               <Input
@@ -126,12 +126,14 @@ function RouteComponent() {
                             <span>{land.area}</span>
                           </div>
                         </div>
+                        <Link to="/dField">
                         <Button
                           variant="outline"
                           className="w-full rounded-full border-gray-300 text-gray-700 hover:bg-gray-50"
                         >
                           LIHAT
                         </Button>
+                        </Link>
                       </CardContent>
                     </div>
                   </Card>

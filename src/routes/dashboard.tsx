@@ -1,5 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useRef, useState } from "react"
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect, useRef, useState } from "react"
 import { Bell, ChevronLeft, ChevronRight, Search } from "lucide-react"
 import Autoplay from "embla-carousel-autoplay"
 import { Input } from "@/components/ui/input"
@@ -13,6 +13,17 @@ export const Route = createFileRoute('/dashboard')({
 })
 
 function RouteComponent() {
+  const navigate = useNavigate();
+
+  const getToken = async () => {
+    const token = await localStorage.getItem("token");
+    if (!token){
+      navigate({ to: '/login' }); 
+    }
+  } 
+  useEffect(()=> {
+    getToken();
+  }, [])
   const [activePage, setActivePage] = useState(0)
 
   const landData = [

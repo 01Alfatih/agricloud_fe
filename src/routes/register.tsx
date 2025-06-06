@@ -1,6 +1,10 @@
-import { Link , createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from "react"
 import { Apple, Eye, EyeOff, Facebook } from "lucide-react"
+import * as z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -10,7 +14,58 @@ export const Route = createFileRoute('/register')({
   component: RouteComponent,
 })
 
+interface IRegister {
+  name: string;
+  email: string;
+  mPhone: string;
+  password: string;
+}
+
+interface IRegisterResponse {
+  access_token: string;
+  token_type: string;
+}
+
+const schema = z.object({
+  name: z.string().min(5, { message: "masukan nama minimal 5 huruf" }),
+  email: z.string().email({ message: "masukan email yang valid" }),
+  mPhone: z.string().min(11, { message: "masukan nomor telepon minimal 10 digit" }),
+  password: z.string().min(6, { message: "masukan password minimal 6 huruf" }),
+});
+
+export type RegisterType = z.infer<typeof schema>;
+
 function RouteComponent() {
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IRegister>({
+    resolver: zodResolver(schema),
+  });
+
+  const signUpData = (data: IRegister) => {
+    axios.post<IRegisterResponse>('http://localhost:8000/api/auth/register', {
+      name: data.name,
+      email: data.email,
+      phone_number: data.mPhone,
+      password: data.password,
+      role: "farmer"
+    }).then((response) => {
+      try {
+            localStorage.setItem("token", response.data.access_token);
+            navigate({ to: '/dashboard' });
+        } catch (error) {
+            console.error("Error setting token:", error); // Handle error jika terjadi kesalahan saat menyimpan token
+        }
+
+    }).catch((error)=> {
+      alert(error.response.data.message); // Tampilkan pesan error jika terjadi kesalahan saat registrasi
+      console.log("Registration failed:", error); // Handle error untuk menampilkan pesan kesalahan axios
+    })
+  }
+
   const [showPassword, setShowPassword] = useState(false)
   return (
     <div className='h-screen w-full'>
@@ -68,21 +123,46 @@ function RouteComponent() {
                 </div>
               </div>
 
-              <form className="space-y-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Name</Label>
-                  <Input id="name" placeholder="Your full name" />
+                  <Input id="name" placeholder="Your full name"
+                    {...register("name")}
+                  />
+                  {errors.name && (
+                    <span className="text-red-500">{errors.name.message}</span>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="Your email address" />
+                  <Input id="email" type="email" placeholder="Your email address"
+                    {...register("email")}
+                  />
+                  {errors.email && (
+                    <span className="text-red-500">{errors.email.message}</span>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="name">Mobile Phone</Label>
+                  <Input id="mPhone" type="text" placeholder="Your phone number"
+                    {...register("mPhone")}
+                  />
+                  {errors.mPhone && (
+                    <span className="text-red-500">{errors.mPhone.message}</span>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
                   <div className="relative">
-                    <Input id="password" type={showPassword ? "text" : "password"} placeholder="Your password" />
+                    <Input id="password" type={showPassword ? "text" : "password"} placeholder="Your password"
+                      {...register("password")}
+                    />
+                    {errors.password && (
+                      <span className="text-red-500">{errors.password.message}</span>
+                    )}
                     <Button
                       type="button"
                       variant="ghost"
@@ -102,7 +182,7 @@ function RouteComponent() {
                   </Label>
                 </div>
 
-                <Button className="w-full bg-green-500 hover:bg-green-700" size="lg">
+                <Button className="w-full bg-green-500 hover:bg-green-700" size="lg" onClick={handleSubmit(signUpData)}>
                   SIGN UP
                 </Button>
 
@@ -110,7 +190,7 @@ function RouteComponent() {
                   Already have an account?{" "}
                   <Link to='/login' className="text-green-600 hover:underline">Sign in</Link>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
         </div>

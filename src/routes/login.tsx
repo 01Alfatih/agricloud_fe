@@ -1,6 +1,10 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import axios from 'axios'
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,7 +17,48 @@ export const Route = createFileRoute('/login')({
   component: RouteComponent,
 })
 
+interface ILogin {
+  email: string;
+  password: string;
+}
+
+const schema = z.object({
+  email: z.string().email({ message: "Masukkan email yang valid" }),
+  password: z.string().min(6, { message: "Masukkan password minimal 6 karakter" }),
+})
+
+
 function RouteComponent() {
+  const navigate = useNavigate();
+  const signInLogin = (data: ILogin) => {
+    axios.post('http://localhost:8000/api/auth/login', {
+      email: data.email,
+      password: data.password,
+    }).then((respone) => {
+      try {
+        localStorage.setItem("token", respone.data.access_token); // Simpan token ke localStorage
+        navigate({ to: '/dashboard' }); // Arahkan ke halaman dashboard setelah login berhasil
+      } catch (error) {
+        console.error("Error setting token:", error); // Handle error jika terjadi kesalahan saat menyimpan token
+        
+      }
+      console.log("Login successful:", respone.data);
+    }).catch((error) => {
+      if (error.status === 422){
+        alert("Email atau password salah, silahkan coba lagi!"); // Tampilkan pesan error jika email atau password salah
+      }
+      console.error("Login failed:", error.status); // Handle error jika terjadi kesalahan saat login
+    })
+  }
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ILogin>({
+    resolver: zodResolver(schema),
+  });
+
   const [showPassword, setShowPassword] = useState(false)
   return (
     <div className="flex h-screen w-full">
@@ -32,12 +77,17 @@ function RouteComponent() {
           </div>
 
           {/* Form */}
-          <form className="space-y-6">
+          <div className="space-y-6" >
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium">
                 Email
               </Label>
-              <Input id="email" type="email" placeholder="Alamat Email" className="bg-pink-50 border-0" />
+              <Input id="email" type="email" placeholder="Alamat Email" className="bg-pink-50 border-0"
+                {...register("email")}
+              />
+              {errors.email && (
+                <span className="text-red-500">{errors.email.message}</span>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -50,7 +100,11 @@ function RouteComponent() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   className="bg-gray-50 border-0 pr-10"
+                  {...register("password")}
                 />
+                {errors.password && (
+                  <span className="text-red-500">{errors.password.message}</span>
+                )}
                 <button
                   type="button"
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
@@ -68,7 +122,7 @@ function RouteComponent() {
               </Label>
             </div>
 
-            <Button type="submit" className="w-full bg-[#2D6A4F] hover:bg-[#1B4332]">
+            <Button type="submit" className="w-full bg-[#2D6A4F] hover:bg-[#1B4332]" onClick={handleSubmit(signInLogin)}>
               SIGN IN
             </Button>
 
@@ -76,7 +130,7 @@ function RouteComponent() {
               <span className="text-gray-500">Belum memiliki akun? </span>
               <Link to='/register' className="text-[#2D6A4F] font-medium" >Sign up</Link>
             </div>
-          </form>
+          </div>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Eye, EyeOff } from "lucide-react"
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -29,27 +29,34 @@ const schema = z.object({
 
 
 function RouteComponent() {
+
   const navigate = useNavigate();
   const signInLogin = (data: ILogin) => {
     axios.post('http://localhost:8000/api/auth/login', {
       email: data.email,
       password: data.password,
-    }).then((respone) => {
-      try {
-        localStorage.setItem("token", respone.data.access_token); // Simpan token ke localStorage
-        navigate({ to: '/dashboard' }); // Arahkan ke halaman dashboard setelah login berhasil
-      } catch (error) {
-        console.error("Error setting token:", error); // Handle error jika terjadi kesalahan saat menyimpan token
-        
-      }
-      console.log("Login successful:", respone.data);
+    }).then(async (response) => {
+      const token = response.data.access_token;
+      localStorage.setItem("token", token);
+      await getToken();
+
     }).catch((error) => {
-      if (error.status === 422){
+      if (error.status === 422) {
         alert("Email atau password salah, silahkan coba lagi!"); // Tampilkan pesan error jika email atau password salah
       }
       console.error("Login failed:", error.status); // Handle error jika terjadi kesalahan saat login
     })
   }
+
+  const getToken = async () => {
+    const token = await localStorage.getItem("token");
+    if (token) {
+      navigate({ to: '/dashboard' });
+    }
+  }
+  useEffect(() => {
+    getToken();
+  }, [])
 
   const {
     register,

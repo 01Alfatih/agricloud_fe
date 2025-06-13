@@ -30,7 +30,7 @@ function RouteComponent() {
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="nama-tanaman" className="text-gray-600 text-sm">
-              Nama Tanaman
+              Pilih Template
             </Label>
             <Input
               id="nama-tanaman"

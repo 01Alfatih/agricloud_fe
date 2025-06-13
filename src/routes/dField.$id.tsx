@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import {  Droplet, MapPin, Sun, Thermometer } from "lucide-react"
+import { Droplet, MapPin, Sun, Thermometer } from "lucide-react"
 
 import { useState } from 'react'
 import { Card, CardContent } from "@/components/ui/card"
@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import MapClient from '@/components/Map'
 import { Calendar } from '@/components/ui/calendar'
 
-export const Route = createFileRoute('/dField')({
+export const Route = createFileRoute('/dField/$id')({
   component: RouteComponent,
 })
 
@@ -71,7 +71,7 @@ function RouteComponent() {
                     <div className="md:w-3/4 space-y-3">
                       <div className="flex justify-between items-start">
                         <h2 className="text-2xl font-bold">Lahan 1</h2>
-                        <span className="text-sm text-gray-500">Cabai </span>
+
 
                       </div>
                       <p className="text-sm text-gray-700 leading-relaxed">
@@ -90,29 +90,34 @@ function RouteComponent() {
               <div className='flex'>
                 <Card className='mr-5'>
                   <CardContent>
-                <div className="text-center">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    className="rounded-md border"
-                    defaultMonth={new Date(2020, 9)}
-                  />
-                </div>
-                <div className="mt-4 ">
-                  <div className="my-3">
-                    <span className="text-sm font-medium">8 Oktober</span>
-                  <p className="text-sm text-gray-600">Perkiraan Panen</p>
-                  </div>
-                  <div className="my-3 ">                    
-                    <span className="text-sm font-medium">2 Oktober 15:00</span>
-                  <p className="text-sm text-gray-600">Waktu Siram</p>
-                  </div>
-                  <div className="my-3">
-                    <span className="text-sm font-medium">15 Oktober</span>
-                  <p className="text-sm text-gray-600">Ceremony</p>
-                  </div>
-                </div>
+                    <div className="text-center">
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        
+                        className="rounded-md border"
+                        defaultMonth={new Date(2020, 9)}
+                      />
+                    </div>
+                    <div className="mt-4 ">
+                      <div className="my-3">
+                        <span className="text-sm font-medium">8 Oktober</span>
+                        <p className="text-sm text-gray-600">Perkiraan Panen</p>
+                      </div>
+                      <div className="my-3 ">
+                        <span className="text-sm font-medium">2 Oktober 15:00</span>
+                        <p className="text-sm text-gray-600">Waktu Siram</p>
+                      </div>
+                      <div className="my-3 ">
+                        <span className="text-sm font-medium">11 Oktober 15:00</span>
+                        <p className="text-sm text-gray-600">Waktu Siram</p>
+                      </div>
+                      <div className="my-3">
+                        <span className="text-sm font-medium">15 Oktober</span>
+                        <p className="text-sm text-gray-600">Ceremony</p>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
 

@@ -1,5 +1,5 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Apple, Eye, EyeOff, Facebook } from "lucide-react"
 import * as z from "zod";
 import { useForm } from "react-hook-form";
@@ -44,6 +44,16 @@ function RouteComponent() {
   } = useForm<IRegister>({
     resolver: zodResolver(schema),
   });
+
+      const getToken = async () => {
+      const token = await localStorage.getItem("token");
+      if (token){
+        navigate({ to: '/dashboard' }); 
+      }
+    } 
+    useEffect(()=> {
+      getToken();
+    }, [])
 
   const signUpData = (data: IRegister) => {
     axios.post<IRegisterResponse>('http://localhost:8000/api/auth/register', {

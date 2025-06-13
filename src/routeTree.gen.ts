@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as WarehouseImport } from './routes/warehouse'
 import { Route as RegisterImport } from './routes/register'
+import { Route as ProfileImport } from './routes/profile'
 import { Route as LoginImport } from './routes/login'
 import { Route as FormFieldImport } from './routes/formField'
 import { Route as FormCycleImport } from './routes/formCycle'
@@ -20,10 +21,10 @@ import { Route as FieldImport } from './routes/field'
 import { Route as DdWarehouseImport } from './routes/ddWarehouse'
 import { Route as DashboardImport } from './routes/dashboard'
 import { Route as DWarehouseImport } from './routes/dWarehouse'
-import { Route as DFieldImport } from './routes/dField'
 import { Route as DCycleImport } from './routes/dCycle'
 import { Route as CycleImport } from './routes/cycle'
 import { Route as IndexImport } from './routes/index'
+import { Route as DFieldIdImport } from './routes/dField.$id'
 
 // Create/Update Routes
 
@@ -36,6 +37,12 @@ const WarehouseRoute = WarehouseImport.update({
 const RegisterRoute = RegisterImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ProfileRoute = ProfileImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -81,12 +88,6 @@ const DWarehouseRoute = DWarehouseImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DFieldRoute = DFieldImport.update({
-  id: '/dField',
-  path: '/dField',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const DCycleRoute = DCycleImport.update({
   id: '/dCycle',
   path: '/dCycle',
@@ -102,6 +103,12 @@ const CycleRoute = CycleImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DFieldIdRoute = DFieldIdImport.update({
+  id: '/dField/$id',
+  path: '/dField/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -128,13 +135,6 @@ declare module '@tanstack/react-router' {
       path: '/dCycle'
       fullPath: '/dCycle'
       preLoaderRoute: typeof DCycleImport
-      parentRoute: typeof rootRoute
-    }
-    '/dField': {
-      id: '/dField'
-      path: '/dField'
-      fullPath: '/dField'
-      preLoaderRoute: typeof DFieldImport
       parentRoute: typeof rootRoute
     }
     '/dWarehouse': {
@@ -186,6 +186,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileImport
+      parentRoute: typeof rootRoute
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -200,6 +207,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WarehouseImport
       parentRoute: typeof rootRoute
     }
+    '/dField/$id': {
+      id: '/dField/$id'
+      path: '/dField/$id'
+      fullPath: '/dField/$id'
+      preLoaderRoute: typeof DFieldIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -209,7 +223,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cycle': typeof CycleRoute
   '/dCycle': typeof DCycleRoute
-  '/dField': typeof DFieldRoute
   '/dWarehouse': typeof DWarehouseRoute
   '/dashboard': typeof DashboardRoute
   '/ddWarehouse': typeof DdWarehouseRoute
@@ -217,15 +230,16 @@ export interface FileRoutesByFullPath {
   '/formCycle': typeof FormCycleRoute
   '/formField': typeof FormFieldRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/warehouse': typeof WarehouseRoute
+  '/dField/$id': typeof DFieldIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cycle': typeof CycleRoute
   '/dCycle': typeof DCycleRoute
-  '/dField': typeof DFieldRoute
   '/dWarehouse': typeof DWarehouseRoute
   '/dashboard': typeof DashboardRoute
   '/ddWarehouse': typeof DdWarehouseRoute
@@ -233,8 +247,10 @@ export interface FileRoutesByTo {
   '/formCycle': typeof FormCycleRoute
   '/formField': typeof FormFieldRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/warehouse': typeof WarehouseRoute
+  '/dField/$id': typeof DFieldIdRoute
 }
 
 export interface FileRoutesById {
@@ -242,7 +258,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/cycle': typeof CycleRoute
   '/dCycle': typeof DCycleRoute
-  '/dField': typeof DFieldRoute
   '/dWarehouse': typeof DWarehouseRoute
   '/dashboard': typeof DashboardRoute
   '/ddWarehouse': typeof DdWarehouseRoute
@@ -250,8 +265,10 @@ export interface FileRoutesById {
   '/formCycle': typeof FormCycleRoute
   '/formField': typeof FormFieldRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/warehouse': typeof WarehouseRoute
+  '/dField/$id': typeof DFieldIdRoute
 }
 
 export interface FileRouteTypes {
@@ -260,7 +277,6 @@ export interface FileRouteTypes {
     | '/'
     | '/cycle'
     | '/dCycle'
-    | '/dField'
     | '/dWarehouse'
     | '/dashboard'
     | '/ddWarehouse'
@@ -268,14 +284,15 @@ export interface FileRouteTypes {
     | '/formCycle'
     | '/formField'
     | '/login'
+    | '/profile'
     | '/register'
     | '/warehouse'
+    | '/dField/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/cycle'
     | '/dCycle'
-    | '/dField'
     | '/dWarehouse'
     | '/dashboard'
     | '/ddWarehouse'
@@ -283,14 +300,15 @@ export interface FileRouteTypes {
     | '/formCycle'
     | '/formField'
     | '/login'
+    | '/profile'
     | '/register'
     | '/warehouse'
+    | '/dField/$id'
   id:
     | '__root__'
     | '/'
     | '/cycle'
     | '/dCycle'
-    | '/dField'
     | '/dWarehouse'
     | '/dashboard'
     | '/ddWarehouse'
@@ -298,8 +316,10 @@ export interface FileRouteTypes {
     | '/formCycle'
     | '/formField'
     | '/login'
+    | '/profile'
     | '/register'
     | '/warehouse'
+    | '/dField/$id'
   fileRoutesById: FileRoutesById
 }
 
@@ -307,7 +327,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CycleRoute: typeof CycleRoute
   DCycleRoute: typeof DCycleRoute
-  DFieldRoute: typeof DFieldRoute
   DWarehouseRoute: typeof DWarehouseRoute
   DashboardRoute: typeof DashboardRoute
   DdWarehouseRoute: typeof DdWarehouseRoute
@@ -315,15 +334,16 @@ export interface RootRouteChildren {
   FormCycleRoute: typeof FormCycleRoute
   FormFieldRoute: typeof FormFieldRoute
   LoginRoute: typeof LoginRoute
+  ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   WarehouseRoute: typeof WarehouseRoute
+  DFieldIdRoute: typeof DFieldIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CycleRoute: CycleRoute,
   DCycleRoute: DCycleRoute,
-  DFieldRoute: DFieldRoute,
   DWarehouseRoute: DWarehouseRoute,
   DashboardRoute: DashboardRoute,
   DdWarehouseRoute: DdWarehouseRoute,
@@ -331,8 +351,10 @@ const rootRouteChildren: RootRouteChildren = {
   FormCycleRoute: FormCycleRoute,
   FormFieldRoute: FormFieldRoute,
   LoginRoute: LoginRoute,
+  ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   WarehouseRoute: WarehouseRoute,
+  DFieldIdRoute: DFieldIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -348,7 +370,6 @@ export const routeTree = rootRoute
         "/",
         "/cycle",
         "/dCycle",
-        "/dField",
         "/dWarehouse",
         "/dashboard",
         "/ddWarehouse",
@@ -356,8 +377,10 @@ export const routeTree = rootRoute
         "/formCycle",
         "/formField",
         "/login",
+        "/profile",
         "/register",
-        "/warehouse"
+        "/warehouse",
+        "/dField/$id"
       ]
     },
     "/": {
@@ -368,9 +391,6 @@ export const routeTree = rootRoute
     },
     "/dCycle": {
       "filePath": "dCycle.tsx"
-    },
-    "/dField": {
-      "filePath": "dField.tsx"
     },
     "/dWarehouse": {
       "filePath": "dWarehouse.tsx"
@@ -393,11 +413,17 @@ export const routeTree = rootRoute
     "/login": {
       "filePath": "login.tsx"
     },
+    "/profile": {
+      "filePath": "profile.tsx"
+    },
     "/register": {
       "filePath": "register.tsx"
     },
     "/warehouse": {
       "filePath": "warehouse.tsx"
+    },
+    "/dField/$id": {
+      "filePath": "dField.$id.tsx"
     }
   }
 }

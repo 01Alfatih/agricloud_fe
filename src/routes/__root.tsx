@@ -9,7 +9,7 @@ export const Route = createRootRoute({
   component: () => {
     const { location } = useRouterState()
 
-    const hideHeader = [
+    const basePathsHide = [
       '/login',
       '/login/',
       '/register',
@@ -32,9 +32,14 @@ export const Route = createRootRoute({
       '/dCycle/',
       '/dWarehouse',
       '/dWarehouse/',
-    ].includes(location.pathname)
+      '/profile',
+      '/profile/',
 
-    const showHeader = [
+    ]
+
+
+
+    const basePaths = [
       '/cycle',
       '/cycle/',
       '/crop',
@@ -51,7 +56,19 @@ export const Route = createRootRoute({
       '/dWarehouse/',
       '/ddWarehouse',
       '/ddWarehouse/',
-    ].includes(location.pathname)
+      '/profile',
+      '/profile/',
+      '/eProfile/',
+      '/eProfile/$id',
+    ]
+
+    const showHeader = basePaths.some(path => 
+  location.pathname === path || location.pathname.startsWith(`${path}/`)
+); 
+
+    const hideHeader = basePathsHide.some(path => 
+  location.pathname === path || location.pathname.startsWith(`${path}/`)
+); 
 
     return (
       <>

@@ -1,5 +1,6 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Bell, Home, Layers, Leaf, Warehouse } from "lucide-react"
+import { useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 
@@ -12,6 +13,18 @@ type NavbarProps = {
 };
 
 export default function AgriCloudNavbar({ currentPath }: NavbarProps) {
+  const navigate = useNavigate();
+
+  const getToken = async () => {
+    const token = await localStorage.getItem("token");
+    if (!token) {
+      navigate({ to: '/login' });
+    }
+  }
+  useEffect(() => {
+    getToken();
+  }, [])
+
   const navItems = [
     { label: "Dashboard", paths: ["/dashboard"], icon: <Home size={20} /> },
     { label: "Lahan", paths: ["/field", "/dfield"], icon: <Layers size={20} /> },
@@ -25,21 +38,7 @@ export default function AgriCloudNavbar({ currentPath }: NavbarProps) {
         <div className="h-16 flex items-center justify-between">
           {/* Logo and Brand */}
           <div className="flex items-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-white"
-            >
-              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
-            </svg>
-            <span className="text-xl font-semibold">AgriCloud</span>
+            <img src="/logo1.png" alt="" className='w-40' />
           </div>
 
           {/* Navigation */}
@@ -58,10 +57,12 @@ export default function AgriCloudNavbar({ currentPath }: NavbarProps) {
             <Button variant="ghost" size="icon" className="text-white">
               <Bell className="h-5 w-5" />
             </Button>
-            <Avatar>
-              <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-              <AvatarFallback>U</AvatarFallback>
-            </Avatar>
+            <Link to="/profile">
+              <Avatar>
+                <AvatarImage src="https://i.pravatar.cc/100" alt="User" />
+                <AvatarFallback>asdassddasd</AvatarFallback>
+              </Avatar>
+              </Link>
           </div>
         </div>
       </div>

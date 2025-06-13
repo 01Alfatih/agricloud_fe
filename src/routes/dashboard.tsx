@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect, useRef, useState } from "react"
-import { Bell, ChevronLeft, ChevronRight, Search } from "lucide-react"
+import { createFileRoute } from '@tanstack/react-router'
+import { useRef } from "react"
+import { Bell, Search } from "lucide-react"
 import Autoplay from "embla-carousel-autoplay"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -13,18 +13,20 @@ export const Route = createFileRoute('/dashboard')({
 })
 
 function RouteComponent() {
-  const navigate = useNavigate();
 
-  const getToken = async () => {
-    const token = await localStorage.getItem("token");
-    if (!token){
-      navigate({ to: '/login' }); 
-    }
-  } 
-  useEffect(()=> {
-    getToken();
-  }, [])
-  const [activePage, setActivePage] = useState(0)
+  // {
+  //   landData
+  //     .filter((item) => item.name.toLowerCase().includes(search))
+  //   .map((item) => (
+  //     <div key={
+  //       item.id
+  //     }>
+  //       <p>{
+  //         item.name
+  //       }</p>
+  //     </div>
+  //   ))
+  // }
 
   const landData = [
     { id: 1, name: "Lahan 1 Tanam Cabai", plant: "Cabai", area: "15 Hektare" },
@@ -76,13 +78,7 @@ function RouteComponent() {
     Autoplay({ delay: 2000, stopOnInteraction: true })
   )
 
-  const handlePrevious = () => {
-    setActivePage((prev) => (prev > 0 ? prev - 1 : plantDetails.length - 1))
-  }
 
-  const handleNext = () => {
-    setActivePage((prev) => (prev < plantDetails.length - 1 ? prev + 1 : 0))
-  }
 
   return (
     <div className='h-screen w-full '>
@@ -204,10 +200,10 @@ function RouteComponent() {
                                 <div className="mr-3 relative">
                                   <div
                                     className={`h-6 w-6 rounded-full flex items-center justify-center z-10 relative ${phase.status === "success"
-                                        ? "bg-green-500"
-                                        : phase.status === "warning"
-                                          ? "bg-yellow-500"
-                                          : "bg-red-500"
+                                      ? "bg-green-500"
+                                      : phase.status === "warning"
+                                        ? "bg-yellow-500"
+                                        : "bg-red-500"
                                       }`}
                                   >
                                     <div className="h-3 w-3 bg-white rounded-full" />

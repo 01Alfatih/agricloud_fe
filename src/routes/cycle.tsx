@@ -102,6 +102,7 @@ function RouteComponent() {
 
               {/* Add New Plant Card */}
               <Card className="border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors cursor-pointer">
+                <Link to="/formCycle">
                 <CardContent className="p-8 flex flex-col items-center justify-center h-full min-h-[300px]">
                   <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
                     <Plus className="h-8 w-8 text-gray-500" />
@@ -109,6 +110,7 @@ function RouteComponent() {
                   <h3 className="text-lg font-medium text-gray-700 text-center">Tambah Tanaman Baru</h3>
 
                 </CardContent>
+                </Link>
               </Card>
               </div>
             </CardContent>

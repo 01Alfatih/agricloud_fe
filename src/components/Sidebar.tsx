@@ -1,5 +1,5 @@
 import { HelpCircle, Home, Layers, Leaf, Settings, Warehouse } from "lucide-react"
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "@tanstack/react-router";
@@ -56,6 +56,7 @@ function NavItem({ active = false, icon, label, variant = "default", to }: NavIt
 
 
 export function SidebarDs() {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<IProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
@@ -80,6 +81,16 @@ export function SidebarDs() {
         setLoading(false);
       });
   }, []);
+
+const getToken = async () => {
+    const token = await localStorage.getItem("token");
+    if (!token) {
+      navigate({ to: '/login' });
+    }
+  }
+  useEffect(() => {
+    getToken();
+  }, [])
 
   if (loading) return <div>Loading...</div>;
   if (!profile) return <div>Gagal memuat data profil.</div>;

@@ -36,10 +36,10 @@ function RouteComponent() {
       email: data.email,
       password: data.password,
     }).then(async (response) => {
-      const token = response.data.access_token;
+      const token = response.data.data.access_token;
       localStorage.setItem("token", token);
       await getToken();
-
+      
     }).catch((error) => {
       if (error.status === 422) {
         alert("Email atau password salah, silahkan coba lagi!"); // Tampilkan pesan error jika email atau password salah

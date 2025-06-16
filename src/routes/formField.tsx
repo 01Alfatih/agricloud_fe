@@ -1,4 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,7 +11,35 @@ export const Route = createFileRoute('/formField')({
   component: RouteComponent,
 })
 
+interface IcropTemplate {
+  id: number;
+  name: string;
+}
+
+interface IcropTemplateResponse {
+  id: number,
+  name: string,
+  description: string,
+  thumbnail: null | string,
+  created_at: string,
+  updated_at: string
+}
+
+
+
 function RouteComponent() {
+  const [cropTemplate, setCropTemplate] = useState<IcropTemplate[]>([]);
+
+  useEffect(() => {
+    const fetchCycles = async () => {
+      try {
+        const respone = await axios.get<{ data: IcropTemplateResponse[] }>('http://localhost:8000/api/crop-templates')
+      } catch (error) {
+
+      }
+    }
+  })
+
   return ( 
   <div
       className="min-h-screen w-full bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center p-4"
@@ -25,7 +55,7 @@ function RouteComponent() {
       {/* Form Card */}
       <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm">
         <CardHeader className="pb-4">
-          <h2 className="text-center text-gray-700 font-medium">Tambah Tanam Baru</h2>
+          <h2 className="text-center text-gray-700 font-medium">Tambah Lahan Baru</h2>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">

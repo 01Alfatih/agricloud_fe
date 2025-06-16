@@ -34,7 +34,7 @@ export const Route = createRootRoute({
       '/dWarehouse/',
       '/profile',
       '/profile/',
-
+      '/'
     ]
 
 
@@ -60,6 +60,7 @@ export const Route = createRootRoute({
       '/profile/',
       '/eProfile/',
       '/eProfile/$id',
+      
     ]
 
     const showHeader = basePaths.some(path => 
@@ -73,7 +74,7 @@ export const Route = createRootRoute({
     return (
       <>
         {showHeader && <AgriCloudNavbar  currentPath={location.pathname} />}
-        <div className="flex ">
+        <div className=" ">
           {!hideHeader && <SidebarDs />}
           <Outlet />
           

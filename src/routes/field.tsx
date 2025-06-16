@@ -5,6 +5,7 @@ import axios from 'axios'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
+import { reverseGeocode } from '@/utils/reversGeocode'
 
 export const Route = createFileRoute('/field')({
   component: RouteComponent,
@@ -53,6 +54,7 @@ interface Ifield {
   area: string;
   created_at: string;
   updated_at: string;
+  address?: string;
 }
 
 interface IfieldResponse {
@@ -68,27 +70,45 @@ interface IfieldResponse {
 }
 
 function RouteComponent() {
-  const [fields, setFields] = useState<Ifield[]>([]);
+  const [fields, setFields] = useState<Array<Ifield>>([]);
 
   useEffect(() => {
-  axios.get<{ data: IfieldResponse[] }>('http://localhost:8000/api/fields')
-    .then((response) => {
-      const formattedFields = response.data.data.map(field => ({
-        id: field.id,
-        name: field.name,
-        location: {
-          latitude: field.location.latitude,
-          longitude: field.location.longitude,
-        },
-        area: field.area,
-        created_at: field.created_at,
-        updated_at: field.updated_at,
-      }));
-      setFields(formattedFields);
-    })
-    .catch((error) => {
+  const fetchData = async () => {
+    try {
+      const response = await axios.get<{ data: Array<IfieldResponse> }>('http://localhost:8000/api/fields');
+
+      const enrichedFields: Array<Ifield> = await Promise.all(
+        response.data.data.map(async (field) => {
+          let address = '';
+          try {
+            address = await reverseGeocode(field.location.latitude, field.location.longitude);
+          } catch (err) {
+            console.error("Geocode error:", err);
+            address = "Alamat tidak ditemukan";
+          }
+
+          return {
+            id: field.id,
+            name: field.name,
+            location: {
+              latitude: field.location.latitude,
+              longitude: field.location.longitude,
+            },
+            area: field.area,
+            created_at: field.created_at,
+            updated_at: field.updated_at,
+            address,
+          };
+        })
+      );
+
+      setFields(enrichedFields);
+    } catch (error) {
       console.error("Error fetching fields data:", error);
-    });
+    }
+  };
+
+  fetchData();
 }, []);
 
 return (
@@ -166,7 +186,7 @@ return (
                         </div>
                         <div className="flex items-center gap-2">
                           <MapPin className="h-4 w-4 text-red-500" />
-                          <span>{land.location.latitude}</span>
+                          <span>{land.address || "Memuat alamat..."}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Square className="h-4 w-4 text-yellow-500" />

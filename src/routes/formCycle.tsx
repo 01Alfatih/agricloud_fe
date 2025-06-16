@@ -9,9 +9,14 @@ export const Route = createFileRoute('/formCycle')({
   component: RouteComponent,
 })
 
+
+
+
 function RouteComponent() {
-  return( 
-  <div
+
+
+  return (
+    <div
       className="min-h-screen w-full bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center p-4"
       style={{
         backgroundImage: "url('/form.png')",
@@ -19,7 +24,7 @@ function RouteComponent() {
     >
       {/* Logo */}
       <div className="flex items-center gap-2 mb-8">
-        <img src="/logo1.png" alt="" className='w-xs'/>
+        <img src="/logo1.png" alt="" className='w-xs' />
       </div>
 
       {/* Form Card */}
@@ -58,7 +63,7 @@ function RouteComponent() {
             />
           </div>
 
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="tanggal-mulai" className="text-gray-600 text-sm">
               Tanggal Mulai Tanam
             </Label>
@@ -67,7 +72,7 @@ function RouteComponent() {
               type="date"
               className="border-0 border-b border-gray-300 rounded-none bg-transparent focus:border-gray-500 focus:ring-0 px-0"
             />
-          </div>
+          </div> */}
 
           <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 mt-8">Mulai</Button>
         </CardContent>

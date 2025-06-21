@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -9,11 +10,27 @@ export const Route = createFileRoute('/formCycle')({
   component: RouteComponent,
 })
 
-
+interface iTemplate {
+  id: number;
+  name: string;
+  description: string;
+}
 
 
 function RouteComponent() {
+ const [templates, setTemplates] = useState<iTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | "">("");
 
+  useEffect(() => {
+    // Simulasi fetch dari API
+    const fetchTemplates = async () => {
+      const response = await fetch('http://localhost:8000/api/crop-templates'); 
+      const json = await response.json();
+      setTemplates(json.data);
+    };
+
+    fetchTemplates();
+  }, []);
 
   return (
     <div
@@ -37,10 +54,19 @@ function RouteComponent() {
             <Label htmlFor="nama-tanaman" className="text-gray-600 text-sm">
               Pilih Template
             </Label>
-            <Input
-              id="nama-tanaman"
-              className="border-0 border-b border-gray-300 rounded-none bg-transparent focus:border-gray-500 focus:ring-0 px-0"
-            />
+           <select
+              id="template-id"
+              value={selectedTemplateId}
+              onChange={(e) => setSelectedTemplateId(Number(e.target.value))}
+              className="w-full border-0 border-b border-gray-300 bg-transparent focus:border-gray-500 focus:ring-0 px-0 text-gray-700 text-sm"
+            >
+              <option value="">-- Pilih Template --</option>
+              {templates.map((template) => (
+                <option key={template.id} value={template.id}>
+                  {template.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="space-y-2">
@@ -63,7 +89,7 @@ function RouteComponent() {
             />
           </div>
 
-          {/* <div className="space-y-2">
+          <div className="space-y-2">
             <Label htmlFor="tanggal-mulai" className="text-gray-600 text-sm">
               Tanggal Mulai Tanam
             </Label>
@@ -72,7 +98,7 @@ function RouteComponent() {
               type="date"
               className="border-0 border-b border-gray-300 rounded-none bg-transparent focus:border-gray-500 focus:ring-0 px-0"
             />
-          </div> */}
+          </div>
 
           <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 mt-8">Mulai</Button>
         </CardContent>

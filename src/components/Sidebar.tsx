@@ -99,7 +99,7 @@ const getToken = async () => {
     <div className="fixed inset-y-0 left-0 w-[280px] bg-[#0B4619] text-white flex flex-col rounded-r-2xl ">
       {/* Logo */}
       <div className="p-6 flex items-center gap-2">
-        <img src="/public/logo1.png" alt="AgriCloud" />
+        <img src="/logo1.png" alt="AgriCloud" />
       </div>
 
       {/* Navigation */}

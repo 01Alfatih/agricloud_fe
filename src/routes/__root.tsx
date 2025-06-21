@@ -24,6 +24,8 @@ export const Route = createRootRoute({
       '/field/',
       '/formCycle',
       '/formCycle/',
+      '/formFieldEdit',
+      '/formFieldEdit/',
       '/formField',
       '/formField/',
       '/dField',
@@ -34,7 +36,8 @@ export const Route = createRootRoute({
       '/dWarehouse/',
       '/profile',
       '/profile/',
-      '/'
+      '/',
+
     ]
 
 
@@ -60,24 +63,24 @@ export const Route = createRootRoute({
       '/profile/',
       '/eProfile/',
       '/eProfile/$id',
-      
+
     ]
 
-    const showHeader = basePaths.some(path => 
-  location.pathname === path || location.pathname.startsWith(`${path}/`)
-); 
+    const showHeader = basePaths.some(path =>
+      location.pathname === path || location.pathname.startsWith(`${path}/`)
+    );
 
-    const hideHeader = basePathsHide.some(path => 
-  location.pathname === path || location.pathname.startsWith(`${path}/`)
-); 
+    const hideHeader = basePathsHide.some(path =>
+      location.pathname === path || location.pathname.startsWith(`${path}/`)
+    );
 
     return (
       <>
-        {showHeader && <AgriCloudNavbar  currentPath={location.pathname} />}
+        {showHeader && <AgriCloudNavbar currentPath={location.pathname} />}
         <div className=" ">
           {!hideHeader && <SidebarDs />}
           <Outlet />
-          
+
         </div>
 
         <TanStackRouterDevtools />

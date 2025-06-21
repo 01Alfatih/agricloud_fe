@@ -1,19 +1,94 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useParams } from '@tanstack/react-router'
 import { Droplet, MapPin, Sun, Thermometer } from "lucide-react"
+import axios from 'axios'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 import MapClient from '@/components/Map'
 import { Calendar } from '@/components/ui/calendar'
+import { reverseGeocode } from '@/utils/reversGeocode'
 
 export const Route = createFileRoute('/dField/$id')({
   component: RouteComponent,
 })
 
+interface IMyField {
+  id: number;
+  name: string;
+  description: string;
+  thumbnail: string;
+  location: {
+    latitude: string;
+    longitude: string;
+  };
+  area: string;
+  owner: {
+    id: number;
+    name: string;
+  };
+  created_at: string;
+  updated_at: string;
+  address?: string;
+}
+
+
+
 function RouteComponent() {
   const [date, setDate] = useState<Date | undefined>(new Date(2020, 9, 8))
+  const [field, setField] = useState<IMyField | null>(null);
+  const { id } = useParams({ from: '/dField/$id' })
+
+  useEffect(() => {
+    const fetchField = async () => {
+      try {
+        const res = await axios.get<{ data: IMyField }>(
+          `http://localhost:8000/api/myfields/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        );
+
+        const fetchData = res.data.data;
+
+        let address = '';
+        try {
+          address = await reverseGeocode(fetchData.location.latitude, fetchData.location.longitude);
+        } catch (err) {
+          console.error("Reverse geocode failed:", err);
+          address = 'Alamat tidak ditemukan';
+        }
+
+        setField({
+          id: fetchData.id,
+          name: fetchData.name,
+          description: fetchData.description,
+          thumbnail: fetchData.thumbnail,
+          location: {
+            latitude: fetchData.location.latitude,
+            longitude: fetchData.location.longitude,
+          },
+          area: fetchData.area,
+          owner: {
+            id: fetchData.owner.id,
+            name: fetchData.owner.name,
+          },
+          created_at: fetchData.created_at,
+          updated_at: fetchData.updated_at,
+          address: address,
+        });
+      } catch (error) {
+        console.error('Error fetching field data:', error);
+      }
+    };
+
+    fetchField();
+  }, [id]);
+
+
   return (
     <div className="h-screen w-full relative">
       <img src="/bg-dashboard.png" alt="" className=' w-full h-[50%] object-cover' />
@@ -39,17 +114,17 @@ function RouteComponent() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Alamat Lahan</TableHead>
-                        <TableHead>Nama Jalan, Desa, Kecamatan, Kabupaten, Provinsi</TableHead>
+                        <TableHead>{field?.address ?? 'Alamat belum tersedia'}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       <TableRow>
                         <TableCell>Luas Lahan</TableCell>
-                        <TableCell>5 Hektar</TableCell>
+                        <TableCell>{field?.area} M{'\u00b2'}</TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell>Nama Pemilik</TableCell>
-                        <TableCell>Agung</TableCell>
+                        <TableCell>{field?.owner.name}</TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
@@ -70,18 +145,14 @@ function RouteComponent() {
                     </div>
                     <div className="md:w-3/4 space-y-3">
                       <div className="flex justify-between items-start">
-                        <h2 className="text-2xl font-bold">Lahan 1</h2>
-
-
+                        <h2 className="text-2xl font-bold">{field?.name}</h2>
                       </div>
                       <p className="text-sm text-gray-700 leading-relaxed">
-                        Jenis tanaman hortikultura yang memiliki nilai ekonomis tinggi dan banyak dibudidayakan secara
-                        komersial. Cabai merah cocok dibudidayakan, baik di dataran rendah maupun dataran tinggi, pada lahan
-                        sawah atau tegalan dengan ketinggian 0-1000m dpl.
+                        {field?.description || 'Deskripsi belum tersedia.'}
                       </p>
                       <div className="pt-2">
                         <MapPin className="w-4 h-4 text-green-600" />
-                        <span className="text-sm text-gray-600">5 Hektar</span>
+                        <span className="text-sm text-gray-600">{field?.area} M{'\u00b2'}</span>
                       </div>
                     </div>
                   </div>
@@ -95,7 +166,7 @@ function RouteComponent() {
                         mode="single"
                         selected={date}
                         onSelect={setDate}
-                        
+
                         className="rounded-md border"
                         defaultMonth={new Date(2020, 9)}
                       />
@@ -123,7 +194,13 @@ function RouteComponent() {
 
                 <Card className="bg-white/95 shadow-md h-[50vh] w-[100%]">
                   <CardContent className="p-6 h-[50vh] w-[100%] ">
-                    <MapClient center={[-6.625701, 106.837406]} zoom={20} radius={20} />
+                    {field && (
+                      <MapClient
+                        center={[parseFloat(field.location.latitude), parseFloat(field.location.longitude)] as [number, number]}
+                        radius={parseFloat(field.area)}
+                        zoom={18}
+                      />
+                    )}
                   </CardContent>
                 </Card>
 

@@ -6,43 +6,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { reverseGeocode } from '@/utils/reversGeocode'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Route = createFileRoute('/field')({
   component: RouteComponent,
 })
 
-// const lands = [
-//   {
-//     id: 1,
-//     name: "Lahan 1",
-//     crop: "CABAI",
-//     cropIcon: "🌶️",
-//     owner: "Agung P",
-//     location: "Brebes",
-//     area: "5 Hektar",
-//     image: "/lahan.png",
-//   },
-//   {
-//     id: 2,
-//     name: "Lahan 2",
-//     crop: "ANGGUR",
-//     cropIcon: "🍇",
-//     owner: "Agung P",
-//     location: "Brebes",
-//     area: "5 Hektar",
-//     image: "/lahan.png",
-//   },
-//   {
-//     id: 3,
-//     name: "Lahan 3",
-//     crop: "ANGGUR",
-//     cropIcon: "🍅",
-//     owner: "Agung P",
-//     location: "Brebes",
-//     area: "5 Hektar",
-//     image: "/lahan.png",
-//   },
-// ]
 
 interface Ifield {
   id: number;
@@ -132,6 +106,22 @@ function RouteComponent() {
     fetchData();
   }, []);
 
+    const handleDelete = async (id: number) => {
+    if (!confirm("Yakin ingin menghapus lahan ini?")) return;
+    try {
+      await axios.delete(`http://localhost:8000/api/myfields/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setFields(fields.filter((field) => field.id !== id));
+      alert("Lahan berhasil dihapus.");
+    } catch (error) {
+      console.error("Gagal menghapus:", error);
+      alert("Gagal menghapus lahan.");
+    }
+  };
+
   return (
     <div className='h-screen w-full relative'>
       {/* Header Image */}
@@ -178,13 +168,25 @@ function RouteComponent() {
                         style={{ backgroundImage: `url('${land.thumbnail || "/lahan.png"}')` }}
                       >
                         <div className="absolute inset-0 bg-black/30" />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="absolute top-3 right-3 text-white hover:bg-white/20 rounded-full w-8 h-8 p-0"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="absolute top-3 right-3 text-white hover:bg-white/20 rounded-full w-8 h-8 p-0"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="z-50">
+                            <DropdownMenuItem onClick={() => window.location.href = `/formFieldEdit/${land.id}`}>
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDelete(land.id)} className="text-red-600">
+                              Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                           <div className="text-center mt-2">
                             <span className="bg-black/50 text-white px-3 py-1 rounded-full text-sm font-medium">

@@ -31,7 +31,8 @@ function RouteComponent() {
   const navigate = useNavigate();
   const [locationString, setLocationString] = useState('');
   const [errors, setErrors] = useState<Partial<Record<keyof IMyField | 'locationString', string>>>({});
-  
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+
   const [formData, setFormData] = useState<IMyField>({
     id: 0,
     name: '',
@@ -101,6 +102,7 @@ function RouteComponent() {
       alert("Terjadi kesalahan saat mengirim data.");
     }
   };
+
 
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -199,6 +201,13 @@ function RouteComponent() {
             <Label htmlFor="lokasi-lahan" className="text-gray-600 text-sm">
               Tambah Gambar Lahan
             </Label>
+            {thumbnailUrl && (
+              <img
+                src={thumbnailUrl}
+                alt="Gambar Lahan"
+                className="w-full h-48 object-cover rounded mb-2"
+              />
+            )}
             <Input
               id="thumbnail"
               type="file"
@@ -206,6 +215,11 @@ function RouteComponent() {
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 const file = e.target.files?.[0] || null;
                 setFormData({ ...formData, thumbnail: file });
+                if (file) {
+                  setThumbnailUrl(URL.createObjectURL(file)); //  Generate preview URL dari file yang dipilih
+                } else {
+                  setThumbnailUrl(null); // jika file dihapus
+                }
               }}
               className="border-0 border-b border-gray-300 rounded-none bg-transparent focus:border-gray-500 focus:ring-0 px-0"
             />

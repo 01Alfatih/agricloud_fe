@@ -1,37 +1,77 @@
-import { Link , createFileRoute} from '@tanstack/react-router'
-import { Plus, Search } from "lucide-react"
+import { Link , createFileRoute, useNavigate} from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import { MoreHorizontal, Plus, Search } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export const Route = createFileRoute('/cycle')({
   component: RouteComponent,
 })
 
-const plants = [
-  {
-    name: "Cabai",
-    image: "/cabe1.png",
-    progress: 60,
-    description: "Cabai adalah tanaman hortikultura bernilai ekonomis tinggi.",
-  },
-  {
-    name: "Anggur",
-    image: "/anggur1.png",
-    progress: 60,
-    description: "Anggur cocok ditanam di iklim sedang dan tropis.",
-  },
-  {
-    name: "Tomat",
-    image: "/tomat1.png",
-    progress: 40,
-    description: "Tomat kaya akan vitamin dan mudah dibudidayakan.",
-  },
-];
+
+
+
+interface ICycle {
+  id: number;
+  name: string;
+  description: string;
+  location: string;
+  status: string;
+  progress: number;
+  thumbnail: string | null; // Bisa string atau null
+  start_date: string;       // Format "YYYY-MM-DD"
+  created_at: string;       // Format "YYYY-MM-DDTHH:mm:ss.SSSSSSZ"
+  updated_at: string;       // Format "YYYY-MM-DDTHH:mm:ss.SSSSSSZ"
+}
+
+
 
 function RouteComponent() {
+const [cycle, setCycle] = useState<Array<ICycle>>([]);
+const navigate = useNavigate();
+
+  const fetchCycles = async () => {
+    try {
+      const res = await axios.get<{ data: Array<ICycle> }>('http://localhost:8000/api/mycycles', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setCycle(res.data.data);
+    } catch (err) {
+      console.error("Gagal memuat data cycle:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCycles();
+  }, []);
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Yakin ingin menghapus tanaman ini?")) return;
+    try {
+      await axios.delete(`http://localhost:8000/api/mycycles/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setCycle((prev) => prev.filter((cycles) => cycles.id !== id));
+      alert("Siklus berhasil dihapus.");
+    } catch (error) {
+      console.error("Gagal menghapus siklus:", error);
+      alert("Gagal menghapus siklus.");
+    }
+  };
+
 
 
   return (
@@ -65,33 +105,58 @@ function RouteComponent() {
             <CardContent className="p-6">
               <div className="mb-6">
                 <h1 className="text-2xl font-semibold text-gray-800">Tanaman</h1>
-                <p className="text-sm text-gray-500">4 Tanaman Tersedia</p>
+                <p className="text-sm text-gray-500">{cycle.length} Tanaman Tersedia</p>
               </div>
 
               {/* Plant Cards Grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                {plants.map((plant, index) => (
-                  <Card className="overflow-hidden border-0 shadow-lg" key={index}>
+                {cycle.map((plant) => (
+                  <Card className="overflow-hidden border-0 shadow-lg relative" key={plant.id}>
                     <div className="relative">
-                      <img src={plant.image} alt={plant.name} className="w-full h-48 object-cover" />
-                      <div className="absolute top-2 right-2 bg-white rounded-full px-2 py-0.5 text-xs">
-                        {plant.progress}%
+                      <img
+                        src={plant.thumbnail || "/cabe1.png"}
+                        alt={plant.name}
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="absolute top-2 right-2 z-10">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-white hover:bg-white/20 rounded-full w-8 h-8 p-0"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="z-50">
+                            <DropdownMenuItem onClick={() => navigate({ to: '/formCycleEdit/$id', params: { id: plant.id.toString() } })}>
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDelete(plant.id)} className="text-red-600">
+                              Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      <div className="absolute top-2 left-2 bg-white rounded-full px-2 py-0.5 text-xs z-10">
+                        {plant.progress.toFixed(0)}%
                       </div>
                     </div>
+
                     <CardContent className="p-4">
                       <p className="text-xs text-gray-500">Tanaman</p>
                       <h3 className="font-medium mb-1">{plant.name}</h3>
                       <p className="text-xs text-gray-500 mb-2">{plant.description}</p>
                       <div className="flex items-center justify-between mt-2">
-                        <Link to="/dCycle">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          
-                          className="text-xs h-8 px-4 rounded-full border-gray-300"
-                        >
-                          LIHAT
-                        </Button>
+                        <Link to="/dCycle/$id" params={{ id: plant.id.toString() }}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-xs h-8 px-4 rounded-full border-gray-300"
+                          >
+                            LIHAT
+                          </Button>
                         </Link>
                         <Progress value={plant.progress} className="w-16 h-1.5" />
                       </div>

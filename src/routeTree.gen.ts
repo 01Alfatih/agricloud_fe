@@ -19,11 +19,12 @@ import { Route as FieldRouteImport } from './routes/field'
 import { Route as DdWarehouseRouteImport } from './routes/ddWarehouse'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DWarehouseRouteImport } from './routes/dWarehouse'
-import { Route as DCycleRouteImport } from './routes/dCycle'
 import { Route as CycleRouteImport } from './routes/cycle'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FormFieldEditIdRouteImport } from './routes/formFieldEdit.$id'
+import { Route as FormCycleEditIdRouteImport } from './routes/formCycleEdit.$id'
 import { Route as DFieldIdRouteImport } from './routes/dField.$id'
+import { Route as DCycleIdRouteImport } from './routes/dCycle.$id'
 
 const WarehouseRoute = WarehouseRouteImport.update({
   id: '/warehouse',
@@ -75,11 +76,6 @@ const DWarehouseRoute = DWarehouseRouteImport.update({
   path: '/dWarehouse',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DCycleRoute = DCycleRouteImport.update({
-  id: '/dCycle',
-  path: '/dCycle',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CycleRoute = CycleRouteImport.update({
   id: '/cycle',
   path: '/cycle',
@@ -95,16 +91,25 @@ const FormFieldEditIdRoute = FormFieldEditIdRouteImport.update({
   path: '/formFieldEdit/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FormCycleEditIdRoute = FormCycleEditIdRouteImport.update({
+  id: '/formCycleEdit/$id',
+  path: '/formCycleEdit/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DFieldIdRoute = DFieldIdRouteImport.update({
   id: '/dField/$id',
   path: '/dField/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DCycleIdRoute = DCycleIdRouteImport.update({
+  id: '/dCycle/$id',
+  path: '/dCycle/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cycle': typeof CycleRoute
-  '/dCycle': typeof DCycleRoute
   '/dWarehouse': typeof DWarehouseRoute
   '/dashboard': typeof DashboardRoute
   '/ddWarehouse': typeof DdWarehouseRoute
@@ -115,13 +120,14 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/warehouse': typeof WarehouseRoute
+  '/dCycle/$id': typeof DCycleIdRoute
   '/dField/$id': typeof DFieldIdRoute
+  '/formCycleEdit/$id': typeof FormCycleEditIdRoute
   '/formFieldEdit/$id': typeof FormFieldEditIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cycle': typeof CycleRoute
-  '/dCycle': typeof DCycleRoute
   '/dWarehouse': typeof DWarehouseRoute
   '/dashboard': typeof DashboardRoute
   '/ddWarehouse': typeof DdWarehouseRoute
@@ -132,14 +138,15 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/warehouse': typeof WarehouseRoute
+  '/dCycle/$id': typeof DCycleIdRoute
   '/dField/$id': typeof DFieldIdRoute
+  '/formCycleEdit/$id': typeof FormCycleEditIdRoute
   '/formFieldEdit/$id': typeof FormFieldEditIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cycle': typeof CycleRoute
-  '/dCycle': typeof DCycleRoute
   '/dWarehouse': typeof DWarehouseRoute
   '/dashboard': typeof DashboardRoute
   '/ddWarehouse': typeof DdWarehouseRoute
@@ -150,7 +157,9 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/warehouse': typeof WarehouseRoute
+  '/dCycle/$id': typeof DCycleIdRoute
   '/dField/$id': typeof DFieldIdRoute
+  '/formCycleEdit/$id': typeof FormCycleEditIdRoute
   '/formFieldEdit/$id': typeof FormFieldEditIdRoute
 }
 export interface FileRouteTypes {
@@ -158,7 +167,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cycle'
-    | '/dCycle'
     | '/dWarehouse'
     | '/dashboard'
     | '/ddWarehouse'
@@ -169,13 +177,14 @@ export interface FileRouteTypes {
     | '/profile'
     | '/register'
     | '/warehouse'
+    | '/dCycle/$id'
     | '/dField/$id'
+    | '/formCycleEdit/$id'
     | '/formFieldEdit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/cycle'
-    | '/dCycle'
     | '/dWarehouse'
     | '/dashboard'
     | '/ddWarehouse'
@@ -186,13 +195,14 @@ export interface FileRouteTypes {
     | '/profile'
     | '/register'
     | '/warehouse'
+    | '/dCycle/$id'
     | '/dField/$id'
+    | '/formCycleEdit/$id'
     | '/formFieldEdit/$id'
   id:
     | '__root__'
     | '/'
     | '/cycle'
-    | '/dCycle'
     | '/dWarehouse'
     | '/dashboard'
     | '/ddWarehouse'
@@ -203,14 +213,15 @@ export interface FileRouteTypes {
     | '/profile'
     | '/register'
     | '/warehouse'
+    | '/dCycle/$id'
     | '/dField/$id'
+    | '/formCycleEdit/$id'
     | '/formFieldEdit/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CycleRoute: typeof CycleRoute
-  DCycleRoute: typeof DCycleRoute
   DWarehouseRoute: typeof DWarehouseRoute
   DashboardRoute: typeof DashboardRoute
   DdWarehouseRoute: typeof DdWarehouseRoute
@@ -221,7 +232,9 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   WarehouseRoute: typeof WarehouseRoute
+  DCycleIdRoute: typeof DCycleIdRoute
   DFieldIdRoute: typeof DFieldIdRoute
+  FormCycleEditIdRoute: typeof FormCycleEditIdRoute
   FormFieldEditIdRoute: typeof FormFieldEditIdRoute
 }
 
@@ -297,13 +310,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DWarehouseRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dCycle': {
-      id: '/dCycle'
-      path: '/dCycle'
-      fullPath: '/dCycle'
-      preLoaderRoute: typeof DCycleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/cycle': {
       id: '/cycle'
       path: '/cycle'
@@ -325,11 +331,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FormFieldEditIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/formCycleEdit/$id': {
+      id: '/formCycleEdit/$id'
+      path: '/formCycleEdit/$id'
+      fullPath: '/formCycleEdit/$id'
+      preLoaderRoute: typeof FormCycleEditIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dField/$id': {
       id: '/dField/$id'
       path: '/dField/$id'
       fullPath: '/dField/$id'
       preLoaderRoute: typeof DFieldIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dCycle/$id': {
+      id: '/dCycle/$id'
+      path: '/dCycle/$id'
+      fullPath: '/dCycle/$id'
+      preLoaderRoute: typeof DCycleIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -338,7 +358,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CycleRoute: CycleRoute,
-  DCycleRoute: DCycleRoute,
   DWarehouseRoute: DWarehouseRoute,
   DashboardRoute: DashboardRoute,
   DdWarehouseRoute: DdWarehouseRoute,
@@ -349,7 +368,9 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   WarehouseRoute: WarehouseRoute,
+  DCycleIdRoute: DCycleIdRoute,
   DFieldIdRoute: DFieldIdRoute,
+  FormCycleEditIdRoute: FormCycleEditIdRoute,
   FormFieldEditIdRoute: FormFieldEditIdRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,4 +1,4 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { MapPin, MoreHorizontal, Plus, Search, Square, User, } from "lucide-react"
 import { useEffect, useState } from 'react'
 import axios from 'axios'
@@ -57,6 +57,7 @@ interface IfieldResponse {
 
 function RouteComponent() {
   const [fields, setFields] = useState<Array<Ifield>>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -179,7 +180,7 @@ function RouteComponent() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="z-50">
-                            <DropdownMenuItem onClick={() => window.location.href = `/formFieldEdit/${land.id}`}>
+                            <DropdownMenuItem onClick={() => navigate({ to: '/formFieldEdit/$id', params: { id: land.id.toString() } })}>
                               Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDelete(land.id)} className="text-red-600">

@@ -26,6 +26,8 @@ export const Route = createRootRoute({
       '/formCycle/',
       '/formFieldEdit',
       '/formFieldEdit/',
+      '/formCycleEdit',
+      '/formCycleEdit/',
       '/formField',
       '/formField/',
       '/dField',

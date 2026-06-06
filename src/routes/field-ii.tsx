@@ -17,6 +17,13 @@ export const Route = createFileRoute('/field-ii')({
   component: RouteComponent,
 })
 
+// Ringkasan siklus tanam aktif (lihat PESAN-BACKEND.md §12); null bila belum nanam.
+interface IActiveCycle {
+  plant_name?: string | null
+  phase?: string | null
+  progress?: number | null
+}
+
 interface Ifield {
   id: number
   name: string
@@ -32,6 +39,7 @@ interface Ifield {
     name: string
   }
   crops?: Array<FieldCrop>
+  active_cycle?: IActiveCycle | null
   created_at: string
   updated_at: string
   address?: string
@@ -52,6 +60,7 @@ interface IfieldResponse {
     name: string
   }
   crops?: Array<FieldCrop>
+  active_cycle?: IActiveCycle | null
   created_at: string
   updated_at: string
 }
@@ -187,6 +196,7 @@ function RouteComponent() {
               name: field.owner.name || 'Tidak diketahui',
             },
             crops: field.crops,
+            active_cycle: field.active_cycle,
             created_at: field.created_at,
             updated_at: field.updated_at,
             address,
@@ -369,6 +379,40 @@ function RouteComponent() {
                             {formatArea(land.area)}
                           </Badge>
                         </div>
+
+                        {/* Status tanam — ringkasan siklus aktif (§12) */}
+                        {land.active_cycle?.plant_name ? (
+                          <div className="mb-4 rounded-lg bg-green-500/10 px-3 py-2 dark:bg-green-500/10">
+                            <div className="flex items-center justify-between gap-2 text-sm">
+                              <span className="flex min-w-0 items-center gap-1.5 font-medium text-green-800 dark:text-green-300">
+                                <Sprout className="h-4 w-4 shrink-0" />
+                                <span className="truncate">
+                                  {land.active_cycle.plant_name}
+                                </span>
+                              </span>
+                              {land.active_cycle.phase && (
+                                <Badge className="shrink-0 border-0 bg-green-600/90 text-xs text-white hover:bg-green-600/90">
+                                  {land.active_cycle.phase}
+                                </Badge>
+                              )}
+                            </div>
+                            {typeof land.active_cycle.progress === 'number' && (
+                              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-green-600/15">
+                                <div
+                                  className="h-full rounded-full bg-green-600 dark:bg-green-500"
+                                  style={{
+                                    width: `${land.active_cycle.progress}%`,
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="mb-4 flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-500 dark:bg-white/5 dark:text-gray-400">
+                            <Sprout className="h-4 w-4 shrink-0" />
+                            Belum ada tanam
+                          </div>
+                        )}
 
                         <Link
                           to="/dField-ii/$id"

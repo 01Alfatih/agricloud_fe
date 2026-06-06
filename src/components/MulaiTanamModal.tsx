@@ -131,12 +131,14 @@ export function MulaiTanamModal({
     const token = localStorage.getItem('token')
     setSubmitting(true)
     try {
+      // Kontrak backend POST /cycles: land_id, crop_id (exists:crops), name,
+      // start_date (nullable). `crop-templates` adalah Crop, jadi templateId = crop_id.
       await axios.post(
         `${API_BASE_URL}/cycles`,
         {
-          crop_template_id: templateId,
-          field_id: fieldId,
-          plant_name: plant,
+          land_id: fieldId,
+          crop_id: templateId,
+          name: plant,
           start_date: startDate,
         },
         { headers: { Authorization: `Bearer ${token}` } },
@@ -145,7 +147,26 @@ export function MulaiTanamModal({
       onClose()
     } catch (error) {
       console.error('Gagal memulai tanam:', error)
-      setSubmitError('Gagal memulai tanam. Coba lagi sebentar.')
+      // Petakan error validasi Laravel (422) ke field form bila ada.
+      if (axios.isAxiosError(error) && error.response?.status === 422) {
+        const apiErrors = error.response.data?.errors as
+          | Record<string, Array<string>>
+          | undefined
+        if (apiErrors) {
+          setErrors((prev) => ({
+            ...prev,
+            field: apiErrors.land_id?.[0] ?? prev.field,
+            template: apiErrors.crop_id?.[0] ?? prev.template,
+            plant: apiErrors.name?.[0] ?? prev.plant,
+            date: apiErrors.start_date?.[0] ?? prev.date,
+          }))
+        }
+        setSubmitError(
+          error.response.data?.message ?? 'Periksa kembali isian formulir.',
+        )
+      } else {
+        setSubmitError('Gagal memulai tanam. Coba lagi sebentar.')
+      }
     } finally {
       setSubmitting(false)
     }

@@ -53,9 +53,12 @@ function daysSince(iso?: string): number | null {
 export function ActiveCycleCard({
   fieldId,
   onStartPlanting,
+  refreshKey = 0,
 }: {
   fieldId: string
   onStartPlanting: () => void
+  // Naikkan nilainya untuk memaksa fetch ulang (mis. setelah mulai tanam baru).
+  refreshKey?: number
 }) {
   const [cycle, setCycle] = useState<IActiveCycle | null>(null)
   const [loading, setLoading] = useState(true)
@@ -101,7 +104,7 @@ export function ActiveCycleCard({
       })
 
     return () => controller.abort()
-  }, [fieldId])
+  }, [fieldId, refreshKey])
 
   return (
     <Card className="rounded-xl bg-white shadow-sm dark:border-white/10 dark:bg-[#15211a]">

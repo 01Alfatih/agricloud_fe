@@ -145,18 +145,20 @@ function RouteComponent() {
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [tanamOpen, setTanamOpen] = useState(false)
+  // Dinaikkan setelah berhasil mulai tanam → memaksa ActiveCycleCard fetch ulang.
+  const [cycleRefresh, setCycleRefresh] = useState(0)
 
   const fetchData = async () => {
     setLoading(true)
     try {
-      const response = await axios.get<{ data: Array<IfieldResponse> }>(
-        'http://localhost:8005/api/myfields',
+      // Endpoint detail tunggal (lebih efisien dari ambil seluruh list).
+      const response = await axios.get<{ data: IfieldResponse }>(
+        `http://localhost:8005/api/myfields/${id}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         },
       )
-      // Backend belum punya GET /myfields/{id} → ambil list lalu cari by id.
-      const found = response.data.data.find((f) => f.id.toString() === id)
+      const found = response.data.data
       if (!found) {
         setField(DUMMY_FIELD)
         return
@@ -345,6 +347,7 @@ function RouteComponent() {
         <ActiveCycleCard
           fieldId={id}
           onStartPlanting={() => setTanamOpen(true)}
+          refreshKey={cycleRefresh}
         />
 
         {/* Cuaca (real, per-koordinat lahan) + Peta */}
@@ -387,6 +390,7 @@ function RouteComponent() {
         open={tanamOpen}
         onClose={() => setTanamOpen(false)}
         field={{ id: field.id, name: field.name }}
+        onCreated={() => setCycleRefresh((n) => n + 1)}
       />
     </div>
   )

@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import {
   AlertTriangle,
   Bell,
@@ -22,7 +22,9 @@ import {
 } from 'lucide-react'
 import type { ComponentType } from 'react'
 import { useState } from 'react'
-import { useDarkMode } from '@/lib/preferences'
+import { useDarkMode, usePreferences } from '@/lib/preferences'
+import { useWeather } from '@/hooks/useWeather'
+import { describeWeather } from '@/components/WeatherCard'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -105,14 +107,6 @@ const kpis: {
     icon: AlertTriangle,
     tone: 'warning',
   },
-]
-
-const forecast = [
-  { time: 'Sekarang', icon: Sun, temp: '31°' },
-  { time: '13:00', icon: Sun, temp: '33°' },
-  { time: '15:00', icon: Cloud, temp: '30°' },
-  { time: '17:00', icon: CloudRain, temp: '27°' },
-  { time: '19:00', icon: CloudRain, temp: '25°' },
 ]
 
 const tasks: {
@@ -343,6 +337,123 @@ const warehouseData: {
 
 /* -------------------------------- component ------------------------------- */
 
+// Nama hari singkat dari tanggal ISO; index 0 = "Hari ini".
+function dayLabel(iso: string, index: number): string {
+  if (index === 0) return 'Hari ini'
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return iso
+  return d.toLocaleDateString('id-ID', { weekday: 'short' })
+}
+
+// Kartu cuaca dashboard — pakai koordinat lokasi dari Pengaturan (kecamatan).
+// Tanpa lokasi → ajak user mengaturnya. Desain hero hijau dipertahankan.
+function DashboardWeather() {
+  const { preferences } = usePreferences()
+  const loc = preferences.location
+  const { data, loading, error } = useWeather(
+    loc?.lat ?? null,
+    loc?.lng ?? null,
+  )
+
+  const shell =
+    'overflow-hidden rounded-xl border-none bg-gradient-to-br from-[#2a7039] to-[#0B4619] text-white shadow-md dark:border dark:border-white/10 dark:from-[#1d3327] dark:to-[#13201a]'
+
+  // Belum set lokasi → CTA ke Pengaturan.
+  if (!loc) {
+    return (
+      <Card className={shell}>
+        <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
+          <MapPin className="h-9 w-9 text-amber-200" />
+          <div>
+            <p className="font-semibold">Lokasi belum diatur</p>
+            <p className="mt-1 text-sm text-white/80">
+              Atur wilayah sampai kecamatan untuk melihat cuaca lahanmu.
+            </p>
+          </div>
+          <Link
+            to="/settings-ii"
+            className="mt-1 rounded-lg bg-white/15 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/25"
+          >
+            Atur Lokasi
+          </Link>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const now = data ? describeWeather(data.current.code) : null
+  const NowIcon = now?.icon ?? Cloud
+
+  return (
+    <Card className={shell}>
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-1.5 text-sm text-white/80">
+              <MapPin className="h-4 w-4" /> {loc.label}
+            </div>
+            {loading ? (
+              <div className="mt-2 h-12 w-40 animate-pulse rounded-lg bg-white/15" />
+            ) : error || !data ? (
+              <p className="mt-3 text-sm text-white/80">
+                Cuaca tidak tersedia saat ini.
+              </p>
+            ) : (
+              <div className="mt-2 flex items-center gap-3">
+                <NowIcon className="h-12 w-12 text-amber-300" />
+                <div>
+                  <p className="text-4xl font-semibold leading-none">
+                    {Math.round(data.current.temp)}°C
+                  </p>
+                  <p className="text-sm text-white/80">{now?.label}</p>
+                </div>
+              </div>
+            )}
+          </div>
+          {data && !loading && !error && (
+            <div className="space-y-1.5 text-sm text-white/85">
+              <div className="flex items-center gap-2">
+                <Droplets className="h-4 w-4" /> Lembap {data.current.humidity}%
+              </div>
+              <div className="flex items-center gap-2">
+                <Wind className="h-4 w-4" /> Angin{' '}
+                {Math.round(data.current.windSpeed)} km/j
+              </div>
+              <div className="flex items-center gap-2">
+                <CloudRain className="h-4 w-4" /> Hujan{' '}
+                {data.daily[0]?.rainProb}%
+              </div>
+            </div>
+          )}
+        </div>
+
+        {data && !loading && !error && (
+          <div className="mt-4 grid grid-cols-5 gap-2 border-t border-white/15 pt-3 dark:border-white/10">
+            {data.daily.map((d, i) => {
+              const desc = describeWeather(d.code)
+              const DayIcon = desc.icon
+              return (
+                <div
+                  key={d.date}
+                  className="flex flex-col items-center gap-1 text-center"
+                >
+                  <span className="text-[11px] text-white/70">
+                    {dayLabel(d.date, i)}
+                  </span>
+                  <DayIcon className="h-5 w-5 text-amber-200" />
+                  <span className="text-sm font-medium">
+                    {Math.round(d.tempMax)}°
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
 function RouteComponent() {
   const [dark, toggleDark] = useDarkMode()
   const [activeLandId, setActiveLandId] = useState(fieldPlots[0].id)
@@ -433,52 +544,8 @@ function RouteComponent() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Kolom kiri: cuaca + tindakan */}
           <div className="lg:col-span-2 space-y-4">
-            {/* Cuaca */}
-            <Card className="overflow-hidden rounded-xl border-none bg-gradient-to-br from-[#2a7039] to-[#0B4619] text-white shadow-md dark:border dark:border-white/10 dark:from-[#1d3327] dark:to-[#13201a]">
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-1.5 text-sm text-white/80">
-                      <MapPin className="h-4 w-4" /> Cirebon, Jawa Barat
-                    </div>
-                    <div className="mt-2 flex items-center gap-3">
-                      <Sun className="h-12 w-12 text-amber-300" />
-                      <div>
-                        <p className="text-4xl font-semibold leading-none">
-                          31°C
-                        </p>
-                        <p className="text-sm text-white/80">Cerah berawan</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-1.5 text-sm text-white/85">
-                    <div className="flex items-center gap-2">
-                      <Droplets className="h-4 w-4" /> Lembap 68%
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Wind className="h-4 w-4" /> Angin 12 km/j
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CloudRain className="h-4 w-4" /> Hujan 40% sore
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 grid grid-cols-5 gap-2 border-t border-white/15 pt-3 dark:border-white/10">
-                  {forecast.map((f) => (
-                    <div
-                      key={f.time}
-                      className="flex flex-col items-center gap-1 text-center"
-                    >
-                      <span className="text-[11px] text-white/70">
-                        {f.time}
-                      </span>
-                      <f.icon className="h-5 w-5 text-amber-200" />
-                      <span className="text-sm font-medium">{f.temp}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            {/* Cuaca (real, per-lokasi dari Pengaturan) */}
+            <DashboardWeather />
 
             {/* Tindakan hari ini */}
             <Card className="rounded-xl bg-white shadow-sm dark:bg-[#15211a] dark:border-white/10">

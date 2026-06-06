@@ -15,16 +15,33 @@ import axios from 'axios'
 export type ThemePref = 'light' | 'dark'
 export type LangPref = 'id' | 'en'
 
+// Lokasi user sampai level kecamatan. Koordinat di-resolve sekali saat dipilih
+// (lihat src/lib/wilayah.ts) lalu di-cache di sini supaya cuaca dashboard
+// tidak perlu geocoding ulang tiap render.
+export interface LocationPref {
+  provinceId: string
+  provinceName: string
+  regencyId: string
+  regencyName: string
+  districtId: string
+  districtName: string
+  lat: number
+  lng: number
+  label: string
+}
+
 export interface Preferences {
   theme: ThemePref
   language: LangPref
   notifications: boolean
+  location: LocationPref | null
 }
 
 export const DEFAULT_PREFERENCES: Preferences = {
   theme: 'light',
   language: 'id',
   notifications: true,
+  location: null,
 }
 
 const STORAGE_KEY = 'preferences'

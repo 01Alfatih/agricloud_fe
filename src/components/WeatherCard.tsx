@@ -17,7 +17,7 @@ import { useWeather } from '@/hooks/useWeather'
 
 // WMO weather code → ikon + label Indonesia.
 // Ref: https://open-meteo.com/en/docs (WMO Weather interpretation codes)
-function describeWeather(code: number): {
+export function describeWeather(code: number): {
   icon: ComponentType<{ className?: string }>
   label: string
 } {

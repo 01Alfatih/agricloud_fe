@@ -8,6 +8,7 @@ import {
   KeyRound,
   Loader2,
   Mail,
+  MapPin,
   Moon,
   Phone,
   ShieldCheck,
@@ -17,6 +18,7 @@ import {
 import type { ComponentType, ReactNode } from 'react'
 import { usePreferences } from '@/lib/preferences'
 import type { LangPref, ThemePref } from '@/lib/preferences'
+import { LocationPicker } from '@/components/LocationPicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -32,7 +34,13 @@ const API_BASE_URL = 'http://localhost:8005/api'
 
 /* ------------------------------- tipe & data ------------------------------ */
 
-type SectionId = 'profil' | 'keamanan' | 'notifikasi' | 'tampilan' | 'bahasa'
+type SectionId =
+  | 'profil'
+  | 'keamanan'
+  | 'lokasi'
+  | 'notifikasi'
+  | 'tampilan'
+  | 'bahasa'
 
 interface NavItem {
   id: SectionId
@@ -48,6 +56,12 @@ const SECTIONS: NavItem[] = [
     label: 'Keamanan',
     desc: 'Kata sandi & login',
     icon: ShieldCheck,
+  },
+  {
+    id: 'lokasi',
+    label: 'Lokasi',
+    desc: 'Wilayah untuk cuaca',
+    icon: MapPin,
   },
   {
     id: 'notifikasi',
@@ -189,6 +203,7 @@ function RouteComponent() {
                 <div className="mt-6">
                   {active === 'profil' && <ProfileSection profile={profile} />}
                   {active === 'keamanan' && <SecuritySection />}
+                  {active === 'lokasi' && <LocationSection />}
                   {active === 'notifikasi' && <NotificationSection />}
                   {active === 'tampilan' && <AppearanceSection />}
                   {active === 'bahasa' && <LanguageSection />}
@@ -400,6 +415,23 @@ function PasswordField({
           {hint}
         </p>
       )}
+    </div>
+  )
+}
+
+function LocationSection() {
+  const { preferences, setPreference } = usePreferences()
+  return (
+    <div className="max-w-md space-y-4">
+      <p className="text-sm text-[#1a472a]/70 dark:text-[#a7d1a7]/60">
+        Pilih wilayah sampai tingkat kecamatan. Lokasi ini dipakai untuk
+        menampilkan cuaca di dashboard. Jangan lupa tekan{' '}
+        <span className="font-medium">Simpan</span>.
+      </p>
+      <LocationPicker
+        value={preferences.location}
+        onChange={(loc) => setPreference('location', loc)}
+      />
     </div>
   )
 }

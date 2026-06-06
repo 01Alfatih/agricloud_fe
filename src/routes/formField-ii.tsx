@@ -1,0 +1,568 @@
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { ChangeEvent, DragEvent } from 'react'
+import axios from 'axios'
+import {
+  AlertCircle,
+  ArrowLeft,
+  ImagePlus,
+  Loader2,
+  LocateFixed,
+  MapPin,
+  Ruler,
+  Sprout,
+  Trash2,
+  Undo2,
+} from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
+import { reverseGeocode } from '@/utils/reversGeocode'
+import FieldMapPicker, {
+  centroidOf,
+  polygonAreaSqMeters,
+} from '@/components/FieldMapPicker'
+import type { LatLng } from '@/components/FieldMapPicker'
+
+export const Route = createFileRoute('/formField-ii')({
+  component: RouteComponent,
+})
+
+interface IFormData {
+  name: string
+  description: string
+  area: string
+  thumbnail: File | null
+}
+
+type FieldError = Partial<
+  Record<'name' | 'description' | 'area' | 'location' | 'thumbnail', string>
+>
+
+const DEFAULT_CENTER: [number, number] = [-6.2, 106.81] // Jakarta
+
+function RouteComponent() {
+  const navigate = useNavigate()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const [form, setForm] = useState<IFormData>({
+    name: '',
+    description: '',
+    area: '',
+    thumbnail: null,
+  })
+  const [points, setPoints] = useState<Array<LatLng>>([])
+  const [recenterTo, setRecenterTo] = useState<[number, number] | null>(null)
+  const [areaEdited, setAreaEdited] = useState(false)
+
+  const [errors, setErrors] = useState<FieldError>({})
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+
+  // Preview gambar (object URL) + drag state untuk dropzone.
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [dragOver, setDragOver] = useState(false)
+
+  // Preview alamat hasil reverse-geocode dari centroid poligon.
+  const [addressPreview, setAddressPreview] = useState('')
+  const [geocoding, setGeocoding] = useState(false)
+  const [locating, setLocating] = useState(false)
+
+  // Turunan dari poligon: luas (m²) & titik tengah (lokasi lahan).
+  const area = useMemo(() => polygonAreaSqMeters(points), [points])
+  const centroid = useMemo(() => centroidOf(points), [points])
+
+  // Redirect kalau belum login.
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      navigate({ to: '/login' })
+    }
+  }, [navigate])
+
+  // Auto-isi luas dari poligon, selama user belum override manual.
+  useEffect(() => {
+    if (!areaEdited && points.length >= 3) {
+      setForm((prev) => ({ ...prev, area: String(Math.round(area)) }))
+      setErrors((prev) => ({ ...prev, area: undefined, location: undefined }))
+    }
+  }, [area, points.length, areaEdited])
+
+  // Bersihkan object URL preview saat berganti / unmount biar nggak bocor memori.
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
+    }
+  }, [previewUrl])
+
+  // Reverse-geocode otomatis (debounce) dari centroid → tampilkan alamat.
+  useEffect(() => {
+    if (!centroid) {
+      setAddressPreview('')
+      setGeocoding(false)
+      return
+    }
+    setGeocoding(true)
+    const timer = setTimeout(async () => {
+      try {
+        const address = await reverseGeocode(
+          String(centroid.lat),
+          String(centroid.lng),
+        )
+        setAddressPreview(address)
+      } catch {
+        setAddressPreview('Alamat tidak ditemukan')
+      } finally {
+        setGeocoding(false)
+      }
+    }, 700)
+    return () => clearTimeout(timer)
+  }, [centroid])
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { id, value } = e.target
+    setForm((prev) => ({ ...prev, [id]: value }))
+    setErrors((prev) => ({ ...prev, [id]: undefined }))
+  }
+
+  // ── Peta ──
+  const addPoint = (p: LatLng) => {
+    setPoints((prev) => [...prev, p])
+    setErrors((prev) => ({ ...prev, location: undefined }))
+  }
+  const undoPoint = () => setPoints((prev) => prev.slice(0, -1))
+  const clearPoints = () => {
+    setPoints([])
+    setAreaEdited(false)
+    setForm((prev) => ({ ...prev, area: '' }))
+  }
+
+  // ── Gambar ──
+  const applyFile = (file: File | null) => {
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setErrors((prev) => ({ ...prev, thumbnail: 'File harus berupa gambar.' }))
+      return
+    }
+    if (previewUrl) URL.revokeObjectURL(previewUrl)
+    setForm((prev) => ({ ...prev, thumbnail: file }))
+    setPreviewUrl(URL.createObjectURL(file))
+    setErrors((prev) => ({ ...prev, thumbnail: undefined }))
+  }
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) =>
+    applyFile(e.target.files?.[0] ?? null)
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setDragOver(false)
+    applyFile(e.dataTransfer.files?.[0] ?? null)
+  }
+  const removeImage = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl)
+    setPreviewUrl(null)
+    setForm((prev) => ({ ...prev, thumbnail: null }))
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  // Geser peta ke lokasi GPS user (tidak menambah titik).
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      setErrors((prev) => ({
+        ...prev,
+        location: 'Browser tidak mendukung geolokasi.',
+      }))
+      return
+    }
+    setLocating(true)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setRecenterTo([pos.coords.latitude, pos.coords.longitude])
+        setLocating(false)
+      },
+      () => {
+        setErrors((prev) => ({
+          ...prev,
+          location: 'Gagal mengambil lokasi. Izinkan akses lokasi.',
+        }))
+        setLocating(false)
+      },
+    )
+  }
+
+  const validate = (): FieldError => {
+    const next: FieldError = {}
+    if (!form.name.trim()) next.name = 'Nama lahan wajib diisi.'
+    if (!form.description.trim()) next.description = 'Deskripsi wajib diisi.'
+    if (points.length < 3)
+      next.location = 'Tandai minimal 3 titik di peta untuk membentuk lahan.'
+    if (!form.area.trim()) next.area = 'Luas lahan wajib diisi.'
+    else if (Number.isNaN(Number(form.area)))
+      next.area = 'Luas lahan harus berupa angka.'
+    if (!form.thumbnail) next.thumbnail = 'Gambar lahan wajib dipilih.'
+    return next
+  }
+
+  const handleSubmit = async () => {
+    setSubmitError('')
+    const token = localStorage.getItem('token')
+    if (!token) {
+      navigate({ to: '/login' })
+      return
+    }
+
+    const nextErrors = validate()
+    setErrors(nextErrors)
+    if (Object.keys(nextErrors).length > 0 || !centroid) return
+
+    const data = new FormData()
+    data.append('name', form.name)
+    data.append('description', form.description)
+    data.append('area', form.area)
+    data.append('latitude', String(centroid.lat))
+    data.append('longitude', String(centroid.lng))
+    // Kirim juga titik-titik poligon (kalau backend mendukung penyimpanan boundary).
+    data.append('boundary', JSON.stringify(points.map((p) => [p.lat, p.lng])))
+    if (form.thumbnail) data.append('thumbnail', form.thumbnail)
+
+    setSubmitting(true)
+    try {
+      await axios.post('http://localhost:8005/api/myfields', data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      navigate({ to: '/field' })
+    } catch (error) {
+      console.error('Gagal mengirim data lahan:', error)
+      setSubmitError(
+        'Terjadi kesalahan saat menyimpan lahan. Coba lagi sebentar.',
+      )
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const areaHa = area / 10000
+
+  return (
+    <div
+      className="relative min-h-screen w-full bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: "url('/form.png')" }}
+    >
+      <div className="absolute inset-0 bg-black/30" />
+
+      <div className="relative flex min-h-screen flex-col items-center justify-center p-4 py-10">
+        <img src="/logo1.png" alt="AgriCloud" className="mb-6 w-44" />
+
+        <Card className="w-full max-w-5xl overflow-hidden border-0 bg-white/95 p-0 shadow-2xl backdrop-blur-sm">
+          <CardContent className="grid grid-cols-1 gap-0 p-0 lg:grid-cols-2">
+            {/* ── Kolom kiri: peta penanda lahan ── */}
+            <div className="flex flex-col bg-gray-50/80 p-6 md:p-8">
+              <div className="mb-1 flex items-center gap-2 text-green-700">
+                <Sprout className="h-5 w-5" />
+                <h2 className="text-lg font-semibold">Tandai Lahan di Peta</h2>
+              </div>
+              <p className="mb-4 text-sm text-gray-500">
+                Klik di peta untuk menaruh titik. Minimal 3 titik untuk
+                membentuk area — luas dihitung otomatis.
+              </p>
+
+              {/* Toolbar peta */}
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                  {points.length} titik
+                </span>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={undoPoint}
+                  disabled={points.length === 0}
+                  className="h-8 gap-1.5 px-3 text-xs"
+                >
+                  <Undo2 className="h-3.5 w-3.5" />
+                  Undo
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={clearPoints}
+                  disabled={points.length === 0}
+                  className="h-8 gap-1.5 px-3 text-xs"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Reset
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={useMyLocation}
+                  disabled={locating}
+                  className="ml-auto h-8 gap-1.5 px-3 text-xs"
+                >
+                  {locating ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <LocateFixed className="h-3.5 w-3.5" />
+                  )}
+                  Lokasi Saya
+                </Button>
+              </div>
+
+              <div className="h-[300px] overflow-hidden rounded-xl border border-gray-200 md:h-[360px] lg:flex-1">
+                <FieldMapPicker
+                  points={points}
+                  onAddPoint={addPoint}
+                  initialCenter={DEFAULT_CENTER}
+                  recenterTo={recenterTo}
+                />
+              </div>
+
+              {/* Readout luas + lokasi */}
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                <div className="rounded-lg bg-white p-3 shadow-xs">
+                  <p className="text-xs text-gray-400">Perkiraan Luas</p>
+                  <p className="text-sm font-semibold text-gray-800">
+                    {points.length >= 3
+                      ? `${Math.round(area).toLocaleString('id-ID')} m²`
+                      : '—'}
+                  </p>
+                  {points.length >= 3 && areaHa >= 0.01 && (
+                    <p className="text-xs text-gray-400">
+                      ≈{' '}
+                      {areaHa.toLocaleString('id-ID', {
+                        maximumFractionDigits: 2,
+                      })}{' '}
+                      ha
+                    </p>
+                  )}
+                </div>
+                <div className="rounded-lg bg-white p-3 shadow-xs">
+                  <p className="text-xs text-gray-400">Lokasi (titik tengah)</p>
+                  <p className="truncate text-sm font-semibold text-gray-800">
+                    {centroid
+                      ? `${centroid.lat.toFixed(5)}, ${centroid.lng.toFixed(5)}`
+                      : '—'}
+                  </p>
+                  {centroid && (
+                    <p className="flex items-center gap-1 truncate text-xs text-gray-400">
+                      <MapPin className="h-3 w-3 shrink-0 text-green-600" />
+                      {geocoding ? 'Mencari alamat…' : addressPreview || '—'}
+                    </p>
+                  )}
+                </div>
+              </div>
+              {errors.location && (
+                <p className="mt-2 flex items-center gap-1 text-sm text-red-500">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  {errors.location}
+                </p>
+              )}
+            </div>
+
+            {/* ── Kolom kanan: detail lahan ── */}
+            <div className="flex flex-col gap-5 p-6 md:p-8">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Detail Lahan
+              </h2>
+
+              {/* Nama */}
+              <div className="space-y-1.5">
+                <Label htmlFor="name" className="text-sm text-gray-600">
+                  Nama Lahan
+                </Label>
+                <Input
+                  id="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  aria-invalid={!!errors.name}
+                  placeholder="Contoh: Lahan Cabai Brebes"
+                />
+                {errors.name && (
+                  <p className="text-sm text-red-500">{errors.name}</p>
+                )}
+              </div>
+
+              {/* Deskripsi */}
+              <div className="space-y-1.5">
+                <Label htmlFor="description" className="text-sm text-gray-600">
+                  Deskripsi
+                </Label>
+                <textarea
+                  id="description"
+                  rows={3}
+                  value={form.description}
+                  onChange={handleChange}
+                  aria-invalid={!!errors.description}
+                  placeholder="Jenis tanaman, kondisi tanah, catatan lainnya…"
+                  className={`w-full resize-none rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 ${
+                    errors.description
+                      ? 'border-destructive focus-visible:border-destructive'
+                      : 'border-input focus-visible:border-ring'
+                  }`}
+                />
+                {errors.description && (
+                  <p className="text-sm text-red-500">{errors.description}</p>
+                )}
+              </div>
+
+              {/* Luas (auto dari peta, bisa diedit) */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="area" className="text-sm text-gray-600">
+                    Luas Lahan
+                  </Label>
+                  {areaEdited && points.length >= 3 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAreaEdited(false)
+                        setForm((prev) => ({
+                          ...prev,
+                          area: String(Math.round(area)),
+                        }))
+                      }}
+                      className="text-xs text-green-600 hover:underline"
+                    >
+                      Pakai hasil peta
+                    </button>
+                  )}
+                </div>
+                <div className="relative">
+                  <Ruler className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <Input
+                    id="area"
+                    inputMode="numeric"
+                    value={form.area}
+                    onChange={(e) => {
+                      setAreaEdited(true)
+                      handleChange(e)
+                    }}
+                    aria-invalid={!!errors.area}
+                    placeholder="Otomatis dari peta"
+                    className="pr-12 pl-9"
+                  />
+                  <span className="absolute top-1/2 right-3 -translate-y-1/2 text-sm text-gray-400">
+                    m²
+                  </span>
+                </div>
+                {errors.area && (
+                  <p className="text-sm text-red-500">{errors.area}</p>
+                )}
+              </div>
+
+              {/* Foto */}
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-600">Foto Lahan</Label>
+                {previewUrl ? (
+                  <div className="group relative overflow-hidden rounded-xl border border-gray-200">
+                    <img
+                      src={previewUrl}
+                      alt="Preview lahan"
+                      className="h-40 w-full object-cover"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="destructive"
+                      onClick={removeImage}
+                      className="absolute top-2 right-2 h-8 gap-1 rounded-full px-3 text-xs"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Hapus
+                    </Button>
+                  </div>
+                ) : (
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => fileInputRef.current?.click()}
+                    onKeyDown={(e) =>
+                      (e.key === 'Enter' || e.key === ' ') &&
+                      fileInputRef.current?.click()
+                    }
+                    onDragOver={(e) => {
+                      e.preventDefault()
+                      setDragOver(true)
+                    }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={handleDrop}
+                    className={`flex h-32 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed text-center transition-colors ${
+                      dragOver
+                        ? 'border-green-500 bg-green-50'
+                        : errors.thumbnail
+                          ? 'border-red-300 bg-red-50/40'
+                          : 'border-gray-300 bg-white hover:border-green-400 hover:bg-green-50/40'
+                    }`}
+                  >
+                    <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-full bg-green-100 text-green-600">
+                      <ImagePlus className="h-6 w-6" />
+                    </div>
+                    <p className="text-sm font-medium text-gray-700">
+                      Klik atau seret gambar
+                    </p>
+                    <p className="text-xs text-gray-400">JPG / PNG</p>
+                  </div>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                {errors.thumbnail && (
+                  <p className="flex items-center gap-1 text-sm text-red-500">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    {errors.thumbnail}
+                  </p>
+                )}
+              </div>
+
+              {submitError && (
+                <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>{submitError}</span>
+                </div>
+              )}
+
+              {/* Aksi */}
+              <div className="mt-auto flex gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate({ to: '/field' })}
+                  disabled={submitting}
+                  className="gap-1.5"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Batal
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  className="flex-1 gap-2 bg-green-600 font-medium text-white hover:bg-green-700"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Menyimpan…
+                    </>
+                  ) : (
+                    'Simpan Lahan'
+                  )}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}

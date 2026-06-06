@@ -1,9 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Droplet, MapPin, Sun, Thermometer } from "lucide-react"
+import { Droplet, MapPin, Sun, Thermometer } from 'lucide-react'
 
 import { useState } from 'react'
-import { Card, CardContent } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardContent } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 import MapClient from '@/components/Map'
 import { Calendar } from '@/components/ui/calendar'
@@ -16,14 +23,20 @@ function RouteComponent() {
   const [date, setDate] = useState<Date | undefined>(new Date(2020, 9, 8))
   return (
     <div className="h-screen w-full relative">
-      <img src="/bg-dashboard.png" alt="" className=' w-full h-[50%] object-cover' />
-      <div className='absolute top-15 '>
+      <img
+        src="/bg-dashboard.png"
+        alt=""
+        className=" w-full h-[50%] object-cover"
+      />
+      <div className="absolute top-15 ">
         <div className="min-h-screen ">
           {/* Header */}
           <header className="mb-8">
             <div className="max-w-6xl mx-auto">
               <div className="flex gap-2 text-white/80 text-sm">
-                <span className="bg-green-500/80 px-3 py-1 rounded">Dashboard</span>
+                <span className="bg-green-500/80 px-3 py-1 rounded">
+                  Dashboard
+                </span>
                 <span className="px-3 py-1">/</span>
                 <span className="bg-green-500/80 px-3 py-1 rounded">Lahan</span>
               </div>
@@ -39,7 +52,9 @@ function RouteComponent() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Alamat Lahan</TableHead>
-                        <TableHead>Nama Jalan, Desa, Kecamatan, Kabupaten, Provinsi</TableHead>
+                        <TableHead>
+                          Nama Jalan, Desa, Kecamatan, Kabupaten, Provinsi
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -71,13 +86,13 @@ function RouteComponent() {
                     <div className="md:w-3/4 space-y-3">
                       <div className="flex justify-between items-start">
                         <h2 className="text-2xl font-bold">Lahan 1</h2>
-
-
                       </div>
                       <p className="text-sm text-gray-700 leading-relaxed">
-                        Jenis tanaman hortikultura yang memiliki nilai ekonomis tinggi dan banyak dibudidayakan secara
-                        komersial. Cabai merah cocok dibudidayakan, baik di dataran rendah maupun dataran tinggi, pada lahan
-                        sawah atau tegalan dengan ketinggian 0-1000m dpl.
+                        Jenis tanaman hortikultura yang memiliki nilai ekonomis
+                        tinggi dan banyak dibudidayakan secara komersial. Cabai
+                        merah cocok dibudidayakan, baik di dataran rendah maupun
+                        dataran tinggi, pada lahan sawah atau tegalan dengan
+                        ketinggian 0-1000m dpl.
                       </p>
                       <div className="pt-2">
                         <MapPin className="w-4 h-4 text-green-600" />
@@ -87,15 +102,14 @@ function RouteComponent() {
                   </div>
                 </CardContent>
               </Card>
-              <div className='flex'>
-                <Card className='mr-5'>
+              <div className="flex">
+                <Card className="mr-5">
                   <CardContent>
                     <div className="text-center">
                       <Calendar
                         mode="single"
                         selected={date}
                         onSelect={setDate}
-                        
                         className="rounded-md border"
                         defaultMonth={new Date(2020, 9)}
                       />
@@ -106,11 +120,15 @@ function RouteComponent() {
                         <p className="text-sm text-gray-600">Perkiraan Panen</p>
                       </div>
                       <div className="my-3 ">
-                        <span className="text-sm font-medium">2 Oktober 15:00</span>
+                        <span className="text-sm font-medium">
+                          2 Oktober 15:00
+                        </span>
                         <p className="text-sm text-gray-600">Waktu Siram</p>
                       </div>
                       <div className="my-3 ">
-                        <span className="text-sm font-medium">11 Oktober 15:00</span>
+                        <span className="text-sm font-medium">
+                          11 Oktober 15:00
+                        </span>
                         <p className="text-sm text-gray-600">Waktu Siram</p>
                       </div>
                       <div className="my-3">
@@ -123,10 +141,13 @@ function RouteComponent() {
 
                 <Card className="bg-white/95 shadow-md h-[50vh] w-[100%]">
                   <CardContent className="p-6 h-[50vh] w-[100%] ">
-                    <MapClient center={[-6.625701, 106.837406]} zoom={20} radius={20} />
+                    <MapClient
+                      center={[-6.625701, 106.837406]}
+                      zoom={20}
+                      radius={20}
+                    />
                   </CardContent>
                 </Card>
-
               </div>
               {/* Plant Condition Card */}
               <Card className="bg-white/95 shadow-md">
@@ -157,10 +178,18 @@ function RouteComponent() {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b">
-                          <th className="text-left py-2 font-medium">Jenis Nutrisi</th>
-                          <th className="text-left py-2 font-medium">Kebutuhan</th>
-                          <th className="text-left py-2 font-medium">Kapasitas</th>
-                          <th className="text-left py-2 font-medium">Hasil Akhir</th>
+                          <th className="text-left py-2 font-medium">
+                            Jenis Nutrisi
+                          </th>
+                          <th className="text-left py-2 font-medium">
+                            Kebutuhan
+                          </th>
+                          <th className="text-left py-2 font-medium">
+                            Kapasitas
+                          </th>
+                          <th className="text-left py-2 font-medium">
+                            Hasil Akhir
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -170,7 +199,9 @@ function RouteComponent() {
                               <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
                               <span>Bio-Regulasi</span>
                             </div>
-                            <div className="text-xs text-gray-500">NPK 16-16-16</div>
+                            <div className="text-xs text-gray-500">
+                              NPK 16-16-16
+                            </div>
                           </td>
                           <td className="py-2">200 Kg</td>
                           <td className="py-2">50 Kg</td>
@@ -182,7 +213,9 @@ function RouteComponent() {
                               <div className="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
                               <span>Zat Pengatur</span>
                             </div>
-                            <div className="text-xs text-gray-500">NPK 16-16-16</div>
+                            <div className="text-xs text-gray-500">
+                              NPK 16-16-16
+                            </div>
                           </td>
                           <td className="py-2">100 Kg</td>
                           <td className="py-2">50 Kg</td>
@@ -194,7 +227,9 @@ function RouteComponent() {
                               <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
                               <span>Perlindungan Bagian Luar</span>
                             </div>
-                            <div className="text-xs text-gray-500">NPK 16-16-16</div>
+                            <div className="text-xs text-gray-500">
+                              NPK 16-16-16
+                            </div>
                           </td>
                           <td className="py-2">200 Kg</td>
                           <td className="py-2">50 Kg</td>
@@ -206,7 +241,9 @@ function RouteComponent() {
                               <div className="w-3 h-3 rounded-full bg-purple-500 mr-2"></div>
                               <span>Perlindungan Bagian Awal</span>
                             </div>
-                            <div className="text-xs text-gray-500">NPK 16-16-16</div>
+                            <div className="text-xs text-gray-500">
+                              NPK 16-16-16
+                            </div>
                           </td>
                           <td className="py-2">200 Kg</td>
                           <td className="py-2">50 Kg</td>
@@ -218,7 +255,9 @@ function RouteComponent() {
                               <div className="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
                               <span>Perkembangan</span>
                             </div>
-                            <div className="text-xs text-gray-500">NPK 16-16-16</div>
+                            <div className="text-xs text-gray-500">
+                              NPK 16-16-16
+                            </div>
                           </td>
                           <td className="py-2">200 Kg</td>
                           <td className="py-2">50 Kg</td>
@@ -238,10 +277,11 @@ function RouteComponent() {
               <div className="grid grid-cols-1 md:grid-cols-3  ">
                 <div>
                   <div className="flex items-center gap-2 mb-4">
-                    <img src="/logo1.png" alt="" className='w-xs' />
+                    <img src="/logo1.png" alt="" className="w-xs" />
                   </div>
                   <p className="text-sm text-gray-300 mb-4">
-                    Platform monitoring tanaman dan pertanian digital untuk meningkatkan produktivitas pertanian.
+                    Platform monitoring tanaman dan pertanian digital untuk
+                    meningkatkan produktivitas pertanian.
                   </p>
                   <div className="flex gap-3">
                     <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">

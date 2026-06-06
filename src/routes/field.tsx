@@ -1,10 +1,18 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { MapPin, MoreHorizontal, Plus, Search, Square, User, } from "lucide-react"
+import {
+  Leaf,
+  MapPin,
+  MoreHorizontal,
+  Plus,
+  Search,
+  Square,
+  User,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent } from '@/components/ui/card'
 import { reverseGeocode } from '@/utils/reversGeocode'
 
 export const Route = createFileRoute('/field')({
@@ -45,61 +53,70 @@ export const Route = createFileRoute('/field')({
 // ]
 
 interface Ifield {
-  id: number;
-  name: string;
-  description: string;
-  thumbnail: string;
+  id: number
+  name: string
+  description: string
+  thumbnail: string
   location: {
-    latitude: string;
-    longitude: string;
-  };
-  area: string;
+    latitude: string
+    longitude: string
+  }
+  area: string
   owner: {
-    id: number;
-    name: string;
-  };
-  created_at: string;
-  updated_at: string;
-  address?: string;
+    id: number
+    name: string
+  }
+  // Tanaman aktif di lahan ini (dari siklus aktif). Bisa >1 (tumpang sari).
+  // TODO(backend): /myfields belum mengembalikan ini — sediakan `crops`.
+  crops?: Array<{ id: number; name: string }>
+  created_at: string
+  updated_at: string
+  address?: string
 }
 
 interface IfieldResponse {
-  id: number;
-  name: string;
-  description: string;
-  thumbnail: string;
+  id: number
+  name: string
+  description: string
+  thumbnail: string
   location: {
-    latitude: string;
-    longitude: string;
-  };
-  area: string;
+    latitude: string
+    longitude: string
+  }
+  area: string
   owner: {
-    id: number;
-    name: string;
-  };
-  created_at: string;
-  updated_at: string;
+    id: number
+    name: string
+  }
+  created_at: string
+  updated_at: string
 }
 
 function RouteComponent() {
-  const [fields, setFields] = useState<Array<Ifield>>([]);
+  const [fields, setFields] = useState<Array<Ifield>>([])
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<{ data: Array<IfieldResponse> }>('http://localhost:8000/api/myfields', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+        const response = await axios.get<{ data: Array<IfieldResponse> }>(
+          'http://localhost:8005/api/myfields',
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
           },
-        });
+        )
         const enrichedFields: Array<Ifield> = await Promise.all(
           response.data.data.map(async (field) => {
-            let address = '';
+            let address = ''
             try {
-              address = await reverseGeocode(field.location.latitude, field.location.longitude);
+              address = await reverseGeocode(
+                field.location.latitude,
+                field.location.longitude,
+              )
             } catch (err) {
-              console.error("Geocode error:", err);
-              address = "Alamat tidak ditemukan";
+              console.error('Geocode error:', err)
+              address = 'Alamat tidak ditemukan'
             }
 
             return {
@@ -116,26 +133,32 @@ function RouteComponent() {
                 id: field.owner.id,
                 name: field.owner.name || 'Tidak diketahui',
               },
+              // TODO(backend): map daftar tanaman aktif saat API menyediakannya.
+              crops: [],
               created_at: field.created_at,
               updated_at: field.updated_at,
               address,
-            };
-          })
-        );
+            }
+          }),
+        )
 
-        setFields(enrichedFields);
+        setFields(enrichedFields)
       } catch (error) {
-        console.error("Error fetching fields data:", error);
+        console.error('Error fetching fields data:', error)
       }
-    };
+    }
 
-    fetchData();
-  }, []);
+    fetchData()
+  }, [])
 
   return (
-    <div className='h-screen w-full relative'>
+    <div className="h-screen w-full relative">
       {/* Header Image */}
-      <img src="/bg-dashboard.png" alt="" className='w-full h-[50%] object-cover' />
+      <img
+        src="/bg-dashboard.png"
+        alt=""
+        className="w-full h-[50%] object-cover"
+      />
 
       <div className="container mx-auto px-4 py-8">
         {/* Search Bar */}
@@ -164,18 +187,25 @@ function RouteComponent() {
               {/* Header */}
               <div className="mb-6">
                 <h1 className="text-2xl font-semibold text-gray-800">Lahan</h1>
-                <p className="text-sm text-gray-500">{fields.length} Lahan Digunakan</p>
+                <p className="text-sm text-gray-500">
+                  {fields.length} Lahan Digunakan
+                </p>
               </div>
 
               {/* Grid Lahan */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 {fields.map((land) => (
-                  <Card key={land.id} className="overflow-hidden border-0 shadow-lg">
+                  <Card
+                    key={land.id}
+                    className="overflow-hidden border-0 shadow-lg"
+                  >
                     <div className="relative">
                       {/* Image */}
                       <div
                         className="h-48 bg-cover bg-center relative"
-                        style={{ backgroundImage: `url('${land.thumbnail || "/lahan.png"}')` }}
+                        style={{
+                          backgroundImage: `url('${land.thumbnail || '/lahan.png'}')`,
+                        }}
                       >
                         <div className="absolute inset-0 bg-black/30" />
                         <Button
@@ -185,18 +215,33 @@ function RouteComponent() {
                         >
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                          <div className="text-center mt-2">
-                            <span className="bg-black/50 text-white px-3 py-1 rounded-full text-sm font-medium">
-                              {land.thumbnail}
-                            </span>
+                        {/* Badge tanaman aktif — mendukung tumpang sari (>1 tanaman).
+                            Tampilkan maks 2 badge, sisanya jadi "+N". */}
+                        {land.crops && land.crops.length > 0 && (
+                          <div className="absolute bottom-3 left-1/2 flex max-w-[90%] -translate-x-1/2 flex-wrap justify-center gap-1.5">
+                            {land.crops.slice(0, 2).map((crop) => (
+                              <span
+                                key={crop.id}
+                                className="inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-sm font-medium text-green-800 shadow-sm"
+                              >
+                                <Leaf className="h-3.5 w-3.5 text-green-600" />
+                                {crop.name}
+                              </span>
+                            ))}
+                            {land.crops.length > 2 && (
+                              <span className="inline-flex items-center rounded-full bg-black/55 px-2.5 py-1 text-sm font-medium text-white">
+                                +{land.crops.length - 2}
+                              </span>
+                            )}
                           </div>
-                        </div>
+                        )}
                       </div>
 
                       {/* Content */}
                       <CardContent className="p-4">
-                        <h3 className="font-semibold text-lg mb-3">{land.name}</h3>
+                        <h3 className="font-semibold text-lg mb-3">
+                          {land.name}
+                        </h3>
                         <div className="flex justify-between   space-y-2 mb-4 text-sm text-gray-600">
                           <div className="flex items-center gap-2">
                             <User className="h-4 w-4 text-blue-500" />
@@ -204,14 +249,17 @@ function RouteComponent() {
                           </div>
                           <div className="flex items-center gap-2">
                             <MapPin className="h-4 w-4 text-red-500" />
-                            <span>{land.address || "Memuat alamat..."}</span>
+                            <span>{land.address || 'Memuat alamat...'}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Square className="h-4 w-4 text-yellow-500" />
                             <span>{land.area}</span>
                           </div>
                         </div>
-                        <Link to="/dField/$id" params={{ id: land.id.toString() }}>
+                        <Link
+                          to="/dField/$id"
+                          params={{ id: land.id.toString() }}
+                        >
                           <Button
                             variant="outline"
                             className="w-full rounded-full border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -231,7 +279,9 @@ function RouteComponent() {
                       <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
                         <Plus className="h-8 w-8 text-gray-500" />
                       </div>
-                      <h3 className="text-lg font-medium text-gray-700 text-center">Tambah Lahan Baru</h3>
+                      <h3 className="text-lg font-medium text-gray-700 text-center">
+                        Tambah Lahan Baru
+                      </h3>
                     </CardContent>
                   </Link>
                 </Card>

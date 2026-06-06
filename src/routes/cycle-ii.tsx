@@ -1,12 +1,11 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Clock, Leaf, MapPin, Plus, Search, Sprout } from 'lucide-react'
+import { Clock, Leaf, Plus, Search, Sprout } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
 import { MulaiTanamModal } from '@/components/MulaiTanamModal'
 
 export const Route = createFileRoute('/cycle-ii')({
@@ -20,12 +19,12 @@ interface ICropMeta {
   growthDays: number // estimasi umur panen (hari)
 }
 
+// Katalog tanaman (master data crop-template). Bukan tanaman yang sedang
+// ditanam petani tertentu — jadi tidak punya "lahan" / "progress siklus".
 interface IPlant extends ICropMeta {
   id: number
   name: string
   description: string
-  land: string // lahan tempat ditanam (dummy, milik siklus tanam — lihat PESAN-BACKEND.md §9)
-  progress: number // % pertumbuhan siklus tanam (dummy, lihat PESAN-BACKEND.md §9)
 }
 
 interface ICropTemplateResponse {
@@ -206,45 +205,6 @@ function decorateCrop(name: string): ICropMeta {
   )
 }
 
-// PLACEHOLDER: progress pertumbuhan & lahan idealnya datang dari siklus tanam
-// aktif (lihat PESAN-BACKEND.md §9), bukan dari crop-template yang cuma katalog.
-// Sementara ditebak deterministik dari id biar preview tetap bervariasi.
-function placeholderProgress(seed: number): number {
-  return 25 + ((Math.abs(seed) * 37) % 70) // 25..94
-}
-
-function placeholderLand(seed: number): string {
-  return `Lahan ${(Math.abs(seed) % 3) + 1}`
-}
-
-// Dummy tanaman buat preview saat API kosong / belum login.
-const DUMMY_PLANTS: Array<IPlant> = [
-  {
-    id: -1,
-    name: 'Cabai',
-    description: 'Cabai adalah tanaman hortikultura bernilai ekonomis tinggi.',
-    land: 'Lahan 1',
-    progress: 60,
-    ...decorateCrop('Cabai'),
-  },
-  {
-    id: -2,
-    name: 'Anggur',
-    description: 'Anggur cocok ditanam di iklim sedang dan tropis.',
-    land: 'Lahan 2',
-    progress: 60,
-    ...decorateCrop('Anggur'),
-  },
-  {
-    id: -3,
-    name: 'Tomat',
-    description: 'Tomat kaya akan vitamin dan mudah dibudidayakan.',
-    land: 'Lahan 1',
-    progress: 40,
-    ...decorateCrop('Tomat'),
-  },
-]
-
 function PlantCardSkeleton() {
   return (
     <Card className="overflow-hidden border-0 p-0 shadow-md dark:border dark:border-white/10 dark:bg-[#15211a]">
@@ -320,8 +280,6 @@ function RouteComponent() {
             id: tpl.id,
             name: tpl.name,
             description: tpl.description ?? '',
-            land: placeholderLand(tpl.id),
-            progress: placeholderProgress(tpl.id),
             ...guess,
             // Utamakan metadata real dari backend; null → pakai tebakan.
             image: tpl.thumbnail ?? guess.image,
@@ -330,11 +288,10 @@ function RouteComponent() {
           }
         })
 
-        // Kalau API belum ngembaliin tanaman, pakai dummy buat preview.
-        setPlants(enriched.length > 0 ? enriched : DUMMY_PLANTS)
+        setPlants(enriched)
       } catch (error) {
         console.error('Error fetching crop templates:', error)
-        setPlants(DUMMY_PLANTS)
+        setPlants([])
       } finally {
         setLoading(false)
       }
@@ -435,30 +392,9 @@ function RouteComponent() {
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1 text-[11px] text-gray-500 dark:text-gray-400">
-                        <MapPin className="h-3 w-3 shrink-0 text-green-600 dark:text-green-400" />
-                        <span className="truncate">{plant.land}</span>
-                      </div>
-
                       <p className="line-clamp-2 min-h-[2rem] text-xs text-gray-500 dark:text-gray-400">
                         {plant.description || 'Belum ada deskripsi.'}
                       </p>
-
-                      {/* Progress pertumbuhan tanaman */}
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-gray-500 dark:text-gray-400">
-                            Progress
-                          </span>
-                          <span className="font-semibold text-green-600 dark:text-green-400">
-                            {plant.progress}%
-                          </span>
-                        </div>
-                        <Progress
-                          value={plant.progress}
-                          className="h-1.5 bg-gray-100 [&>div]:bg-green-600 dark:bg-white/10 dark:[&>div]:bg-green-500"
-                        />
-                      </div>
 
                       <Link to="/dCycle-ii" className="block pt-1">
                         <Button
@@ -496,6 +432,15 @@ function RouteComponent() {
                 </button>
               )}
             </div>
+
+            {/* Empty state: katalog tanaman masih kosong */}
+            {!loading && plants.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-16 text-center text-gray-500 dark:text-gray-400">
+                <Sprout className="mb-3 h-12 w-12 text-gray-300 dark:text-gray-600" />
+                <p className="font-medium">Belum ada tanaman</p>
+                <p className="text-sm">Katalog tanaman masih kosong.</p>
+              </div>
+            )}
 
             {/* Empty state hasil pencarian */}
             {!loading && plants.length > 0 && filtered.length === 0 && (

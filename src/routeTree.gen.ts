@@ -29,7 +29,6 @@ import { Route as DdWarehouseRouteImport } from './routes/ddWarehouse'
 import { Route as DashboardIiRouteImport } from './routes/dashboard-ii'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DWarehouseRouteImport } from './routes/dWarehouse'
-import { Route as DCycleIiRouteImport } from './routes/dCycle-ii'
 import { Route as DCycleRouteImport } from './routes/dCycle'
 import { Route as CycleIiRouteImport } from './routes/cycle-ii'
 import { Route as CycleRouteImport } from './routes/cycle'
@@ -37,6 +36,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DWarehouseIiIdRouteImport } from './routes/dWarehouse-ii.$id'
 import { Route as DFieldIdRouteImport } from './routes/dField.$id'
 import { Route as DFieldIiIdRouteImport } from './routes/dField-ii.$id'
+import { Route as DCycleIiIdRouteImport } from './routes/dCycle-ii.$id'
 
 const WarehouseIiRoute = WarehouseIiRouteImport.update({
   id: '/warehouse-ii',
@@ -138,11 +138,6 @@ const DWarehouseRoute = DWarehouseRouteImport.update({
   path: '/dWarehouse',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DCycleIiRoute = DCycleIiRouteImport.update({
-  id: '/dCycle-ii',
-  path: '/dCycle-ii',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DCycleRoute = DCycleRouteImport.update({
   id: '/dCycle',
   path: '/dCycle',
@@ -178,13 +173,17 @@ const DFieldIiIdRoute = DFieldIiIdRouteImport.update({
   path: '/dField-ii/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DCycleIiIdRoute = DCycleIiIdRouteImport.update({
+  id: '/dCycle-ii/$id',
+  path: '/dCycle-ii/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cycle': typeof CycleRoute
   '/cycle-ii': typeof CycleIiRoute
   '/dCycle': typeof DCycleRoute
-  '/dCycle-ii': typeof DCycleIiRoute
   '/dWarehouse': typeof DWarehouseRoute
   '/dashboard': typeof DashboardRoute
   '/dashboard-ii': typeof DashboardIiRoute
@@ -205,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/settings-ii': typeof SettingsIiRoute
   '/warehouse': typeof WarehouseRoute
   '/warehouse-ii': typeof WarehouseIiRoute
+  '/dCycle-ii/$id': typeof DCycleIiIdRoute
   '/dField-ii/$id': typeof DFieldIiIdRoute
   '/dField/$id': typeof DFieldIdRoute
   '/dWarehouse-ii/$id': typeof DWarehouseIiIdRoute
@@ -214,7 +214,6 @@ export interface FileRoutesByTo {
   '/cycle': typeof CycleRoute
   '/cycle-ii': typeof CycleIiRoute
   '/dCycle': typeof DCycleRoute
-  '/dCycle-ii': typeof DCycleIiRoute
   '/dWarehouse': typeof DWarehouseRoute
   '/dashboard': typeof DashboardRoute
   '/dashboard-ii': typeof DashboardIiRoute
@@ -235,6 +234,7 @@ export interface FileRoutesByTo {
   '/settings-ii': typeof SettingsIiRoute
   '/warehouse': typeof WarehouseRoute
   '/warehouse-ii': typeof WarehouseIiRoute
+  '/dCycle-ii/$id': typeof DCycleIiIdRoute
   '/dField-ii/$id': typeof DFieldIiIdRoute
   '/dField/$id': typeof DFieldIdRoute
   '/dWarehouse-ii/$id': typeof DWarehouseIiIdRoute
@@ -245,7 +245,6 @@ export interface FileRoutesById {
   '/cycle': typeof CycleRoute
   '/cycle-ii': typeof CycleIiRoute
   '/dCycle': typeof DCycleRoute
-  '/dCycle-ii': typeof DCycleIiRoute
   '/dWarehouse': typeof DWarehouseRoute
   '/dashboard': typeof DashboardRoute
   '/dashboard-ii': typeof DashboardIiRoute
@@ -266,6 +265,7 @@ export interface FileRoutesById {
   '/settings-ii': typeof SettingsIiRoute
   '/warehouse': typeof WarehouseRoute
   '/warehouse-ii': typeof WarehouseIiRoute
+  '/dCycle-ii/$id': typeof DCycleIiIdRoute
   '/dField-ii/$id': typeof DFieldIiIdRoute
   '/dField/$id': typeof DFieldIdRoute
   '/dWarehouse-ii/$id': typeof DWarehouseIiIdRoute
@@ -277,7 +277,6 @@ export interface FileRouteTypes {
     | '/cycle'
     | '/cycle-ii'
     | '/dCycle'
-    | '/dCycle-ii'
     | '/dWarehouse'
     | '/dashboard'
     | '/dashboard-ii'
@@ -298,6 +297,7 @@ export interface FileRouteTypes {
     | '/settings-ii'
     | '/warehouse'
     | '/warehouse-ii'
+    | '/dCycle-ii/$id'
     | '/dField-ii/$id'
     | '/dField/$id'
     | '/dWarehouse-ii/$id'
@@ -307,7 +307,6 @@ export interface FileRouteTypes {
     | '/cycle'
     | '/cycle-ii'
     | '/dCycle'
-    | '/dCycle-ii'
     | '/dWarehouse'
     | '/dashboard'
     | '/dashboard-ii'
@@ -328,6 +327,7 @@ export interface FileRouteTypes {
     | '/settings-ii'
     | '/warehouse'
     | '/warehouse-ii'
+    | '/dCycle-ii/$id'
     | '/dField-ii/$id'
     | '/dField/$id'
     | '/dWarehouse-ii/$id'
@@ -337,7 +337,6 @@ export interface FileRouteTypes {
     | '/cycle'
     | '/cycle-ii'
     | '/dCycle'
-    | '/dCycle-ii'
     | '/dWarehouse'
     | '/dashboard'
     | '/dashboard-ii'
@@ -358,6 +357,7 @@ export interface FileRouteTypes {
     | '/settings-ii'
     | '/warehouse'
     | '/warehouse-ii'
+    | '/dCycle-ii/$id'
     | '/dField-ii/$id'
     | '/dField/$id'
     | '/dWarehouse-ii/$id'
@@ -368,7 +368,6 @@ export interface RootRouteChildren {
   CycleRoute: typeof CycleRoute
   CycleIiRoute: typeof CycleIiRoute
   DCycleRoute: typeof DCycleRoute
-  DCycleIiRoute: typeof DCycleIiRoute
   DWarehouseRoute: typeof DWarehouseRoute
   DashboardRoute: typeof DashboardRoute
   DashboardIiRoute: typeof DashboardIiRoute
@@ -389,6 +388,7 @@ export interface RootRouteChildren {
   SettingsIiRoute: typeof SettingsIiRoute
   WarehouseRoute: typeof WarehouseRoute
   WarehouseIiRoute: typeof WarehouseIiRoute
+  DCycleIiIdRoute: typeof DCycleIiIdRoute
   DFieldIiIdRoute: typeof DFieldIiIdRoute
   DFieldIdRoute: typeof DFieldIdRoute
   DWarehouseIiIdRoute: typeof DWarehouseIiIdRoute
@@ -536,13 +536,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DWarehouseRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dCycle-ii': {
-      id: '/dCycle-ii'
-      path: '/dCycle-ii'
-      fullPath: '/dCycle-ii'
-      preLoaderRoute: typeof DCycleIiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dCycle': {
       id: '/dCycle'
       path: '/dCycle'
@@ -592,6 +585,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DFieldIiIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dCycle-ii/$id': {
+      id: '/dCycle-ii/$id'
+      path: '/dCycle-ii/$id'
+      fullPath: '/dCycle-ii/$id'
+      preLoaderRoute: typeof DCycleIiIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -600,7 +600,6 @@ const rootRouteChildren: RootRouteChildren = {
   CycleRoute: CycleRoute,
   CycleIiRoute: CycleIiRoute,
   DCycleRoute: DCycleRoute,
-  DCycleIiRoute: DCycleIiRoute,
   DWarehouseRoute: DWarehouseRoute,
   DashboardRoute: DashboardRoute,
   DashboardIiRoute: DashboardIiRoute,
@@ -621,6 +620,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsIiRoute: SettingsIiRoute,
   WarehouseRoute: WarehouseRoute,
   WarehouseIiRoute: WarehouseIiRoute,
+  DCycleIiIdRoute: DCycleIiIdRoute,
   DFieldIiIdRoute: DFieldIiIdRoute,
   DFieldIdRoute: DFieldIdRoute,
   DWarehouseIiIdRoute: DWarehouseIiIdRoute,

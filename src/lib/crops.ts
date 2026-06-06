@@ -32,7 +32,7 @@ const CROP_DICT = [
 ]
 
 // Emoji untuk satu nama tanaman (cocokkan kata kunci); default 🌱.
-function emojiForCrop(name: string): string {
+export function emojiForCrop(name: string): string {
   const t = name.toLowerCase()
   const found = CROP_DICT.find((c) => c.keys.some((k) => t.includes(k)))
   return found?.icon ?? '🌱'

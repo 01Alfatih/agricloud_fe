@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -12,6 +12,18 @@
     <link rel="apple-touch-icon" href="/logo192.png" />
     <link rel="manifest" href="/manifest.json" />
     <title>Create TanStack App - agricloud</title>
+    <script>
+      // Terapkan preferensi tema sebelum React mount (cegah flash/FOUC).
+      try {
+        var p = JSON.parse(localStorage.getItem('preferences') || 'null')
+        var theme = (p && p.theme) || localStorage.getItem('theme')
+        if (theme === 'dark') document.documentElement.classList.add('dark')
+        if (p && p.language)
+          document.documentElement.setAttribute('lang', p.language)
+      } catch (e) {
+        /* abaikan */
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>

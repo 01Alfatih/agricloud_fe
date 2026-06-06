@@ -3,3 +3,14 @@ node_modules
 dist
 dist-ssr
 *.local
+.tanstack
+
+# Secrets — jangan commit
+.env
+.env.*
+!.env.example
+
+# Kredensial Google OAuth (client secret) — jangan commit
+client_secret_*.json
+*.apps.googleusercontent.com.json
+*:Zone.Identifier

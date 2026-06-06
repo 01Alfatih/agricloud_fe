@@ -8,423 +8,623 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as WarehouseIiRouteImport } from './routes/warehouse-ii'
+import { Route as WarehouseRouteImport } from './routes/warehouse'
+import { Route as SettingsIiRouteImport } from './routes/settings-ii'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RegisterIiRouteImport } from './routes/register-ii'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ProfileIiRouteImport } from './routes/profile-ii'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as LoginIiRouteImport } from './routes/login-ii'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as FormFieldIiRouteImport } from './routes/formField-ii'
+import { Route as FormFieldRouteImport } from './routes/formField'
+import { Route as FormCycleRouteImport } from './routes/formCycle'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FieldIiRouteImport } from './routes/field-ii'
+import { Route as FieldRouteImport } from './routes/field'
+import { Route as DdWarehouseRouteImport } from './routes/ddWarehouse'
+import { Route as DashboardIiRouteImport } from './routes/dashboard-ii'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as DWarehouseRouteImport } from './routes/dWarehouse'
+import { Route as DCycleIiRouteImport } from './routes/dCycle-ii'
+import { Route as DCycleRouteImport } from './routes/dCycle'
+import { Route as CycleIiRouteImport } from './routes/cycle-ii'
+import { Route as CycleRouteImport } from './routes/cycle'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as DWarehouseIiIdRouteImport } from './routes/dWarehouse-ii.$id'
+import { Route as DFieldIdRouteImport } from './routes/dField.$id'
+import { Route as DFieldIiIdRouteImport } from './routes/dField-ii.$id'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as WarehouseImport } from './routes/warehouse'
-import { Route as RegisterImport } from './routes/register'
-import { Route as ProfileImport } from './routes/profile'
-import { Route as LoginImport } from './routes/login'
-import { Route as FormFieldImport } from './routes/formField'
-import { Route as FormCycleImport } from './routes/formCycle'
-import { Route as FieldImport } from './routes/field'
-import { Route as DdWarehouseImport } from './routes/ddWarehouse'
-import { Route as DashboardImport } from './routes/dashboard'
-import { Route as DWarehouseImport } from './routes/dWarehouse'
-import { Route as DCycleImport } from './routes/dCycle'
-import { Route as CycleImport } from './routes/cycle'
-import { Route as IndexImport } from './routes/index'
-import { Route as DFieldIdImport } from './routes/dField.$id'
-
-// Create/Update Routes
-
-const WarehouseRoute = WarehouseImport.update({
+const WarehouseIiRoute = WarehouseIiRouteImport.update({
+  id: '/warehouse-ii',
+  path: '/warehouse-ii',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WarehouseRoute = WarehouseRouteImport.update({
   id: '/warehouse',
   path: '/warehouse',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const RegisterRoute = RegisterImport.update({
+const SettingsIiRoute = SettingsIiRouteImport.update({
+  id: '/settings-ii',
+  path: '/settings-ii',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterIiRoute = RegisterIiRouteImport.update({
+  id: '/register-ii',
+  path: '/register-ii',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ProfileRoute = ProfileImport.update({
+const ProfileIiRoute = ProfileIiRouteImport.update({
+  id: '/profile-ii',
+  path: '/profile-ii',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const LoginRoute = LoginImport.update({
+const LoginIiRoute = LoginIiRouteImport.update({
+  id: '/login-ii',
+  path: '/login-ii',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const FormFieldRoute = FormFieldImport.update({
+const FormFieldIiRoute = FormFieldIiRouteImport.update({
+  id: '/formField-ii',
+  path: '/formField-ii',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FormFieldRoute = FormFieldRouteImport.update({
   id: '/formField',
   path: '/formField',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const FormCycleRoute = FormCycleImport.update({
+const FormCycleRoute = FormCycleRouteImport.update({
   id: '/formCycle',
   path: '/formCycle',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const FieldRoute = FieldImport.update({
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FieldIiRoute = FieldIiRouteImport.update({
+  id: '/field-ii',
+  path: '/field-ii',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FieldRoute = FieldRouteImport.update({
   id: '/field',
   path: '/field',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const DdWarehouseRoute = DdWarehouseImport.update({
+const DdWarehouseRoute = DdWarehouseRouteImport.update({
   id: '/ddWarehouse',
   path: '/ddWarehouse',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const DashboardRoute = DashboardImport.update({
+const DashboardIiRoute = DashboardIiRouteImport.update({
+  id: '/dashboard-ii',
+  path: '/dashboard-ii',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const DWarehouseRoute = DWarehouseImport.update({
+const DWarehouseRoute = DWarehouseRouteImport.update({
   id: '/dWarehouse',
   path: '/dWarehouse',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const DCycleRoute = DCycleImport.update({
+const DCycleIiRoute = DCycleIiRouteImport.update({
+  id: '/dCycle-ii',
+  path: '/dCycle-ii',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DCycleRoute = DCycleRouteImport.update({
   id: '/dCycle',
   path: '/dCycle',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const CycleRoute = CycleImport.update({
+const CycleIiRoute = CycleIiRouteImport.update({
+  id: '/cycle-ii',
+  path: '/cycle-ii',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CycleRoute = CycleRouteImport.update({
   id: '/cycle',
   path: '/cycle',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const DFieldIdRoute = DFieldIdImport.update({
+const DWarehouseIiIdRoute = DWarehouseIiIdRouteImport.update({
+  id: '/dWarehouse-ii/$id',
+  path: '/dWarehouse-ii/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DFieldIdRoute = DFieldIdRouteImport.update({
   id: '/dField/$id',
   path: '/dField/$id',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/cycle': {
-      id: '/cycle'
-      path: '/cycle'
-      fullPath: '/cycle'
-      preLoaderRoute: typeof CycleImport
-      parentRoute: typeof rootRoute
-    }
-    '/dCycle': {
-      id: '/dCycle'
-      path: '/dCycle'
-      fullPath: '/dCycle'
-      preLoaderRoute: typeof DCycleImport
-      parentRoute: typeof rootRoute
-    }
-    '/dWarehouse': {
-      id: '/dWarehouse'
-      path: '/dWarehouse'
-      fullPath: '/dWarehouse'
-      preLoaderRoute: typeof DWarehouseImport
-      parentRoute: typeof rootRoute
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardImport
-      parentRoute: typeof rootRoute
-    }
-    '/ddWarehouse': {
-      id: '/ddWarehouse'
-      path: '/ddWarehouse'
-      fullPath: '/ddWarehouse'
-      preLoaderRoute: typeof DdWarehouseImport
-      parentRoute: typeof rootRoute
-    }
-    '/field': {
-      id: '/field'
-      path: '/field'
-      fullPath: '/field'
-      preLoaderRoute: typeof FieldImport
-      parentRoute: typeof rootRoute
-    }
-    '/formCycle': {
-      id: '/formCycle'
-      path: '/formCycle'
-      fullPath: '/formCycle'
-      preLoaderRoute: typeof FormCycleImport
-      parentRoute: typeof rootRoute
-    }
-    '/formField': {
-      id: '/formField'
-      path: '/formField'
-      fullPath: '/formField'
-      preLoaderRoute: typeof FormFieldImport
-      parentRoute: typeof rootRoute
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginImport
-      parentRoute: typeof rootRoute
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileImport
-      parentRoute: typeof rootRoute
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterImport
-      parentRoute: typeof rootRoute
-    }
-    '/warehouse': {
-      id: '/warehouse'
-      path: '/warehouse'
-      fullPath: '/warehouse'
-      preLoaderRoute: typeof WarehouseImport
-      parentRoute: typeof rootRoute
-    }
-    '/dField/$id': {
-      id: '/dField/$id'
-      path: '/dField/$id'
-      fullPath: '/dField/$id'
-      preLoaderRoute: typeof DFieldIdImport
-      parentRoute: typeof rootRoute
-    }
-  }
-}
-
-// Create and export the route tree
+const DFieldIiIdRoute = DFieldIiIdRouteImport.update({
+  id: '/dField-ii/$id',
+  path: '/dField-ii/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cycle': typeof CycleRoute
+  '/cycle-ii': typeof CycleIiRoute
   '/dCycle': typeof DCycleRoute
+  '/dCycle-ii': typeof DCycleIiRoute
   '/dWarehouse': typeof DWarehouseRoute
   '/dashboard': typeof DashboardRoute
+  '/dashboard-ii': typeof DashboardIiRoute
   '/ddWarehouse': typeof DdWarehouseRoute
   '/field': typeof FieldRoute
+  '/field-ii': typeof FieldIiRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/formCycle': typeof FormCycleRoute
   '/formField': typeof FormFieldRoute
+  '/formField-ii': typeof FormFieldIiRoute
   '/login': typeof LoginRoute
+  '/login-ii': typeof LoginIiRoute
   '/profile': typeof ProfileRoute
+  '/profile-ii': typeof ProfileIiRoute
   '/register': typeof RegisterRoute
+  '/register-ii': typeof RegisterIiRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/settings-ii': typeof SettingsIiRoute
   '/warehouse': typeof WarehouseRoute
+  '/warehouse-ii': typeof WarehouseIiRoute
+  '/dField-ii/$id': typeof DFieldIiIdRoute
   '/dField/$id': typeof DFieldIdRoute
+  '/dWarehouse-ii/$id': typeof DWarehouseIiIdRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cycle': typeof CycleRoute
+  '/cycle-ii': typeof CycleIiRoute
   '/dCycle': typeof DCycleRoute
+  '/dCycle-ii': typeof DCycleIiRoute
   '/dWarehouse': typeof DWarehouseRoute
   '/dashboard': typeof DashboardRoute
+  '/dashboard-ii': typeof DashboardIiRoute
   '/ddWarehouse': typeof DdWarehouseRoute
   '/field': typeof FieldRoute
+  '/field-ii': typeof FieldIiRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/formCycle': typeof FormCycleRoute
   '/formField': typeof FormFieldRoute
+  '/formField-ii': typeof FormFieldIiRoute
   '/login': typeof LoginRoute
+  '/login-ii': typeof LoginIiRoute
   '/profile': typeof ProfileRoute
+  '/profile-ii': typeof ProfileIiRoute
   '/register': typeof RegisterRoute
+  '/register-ii': typeof RegisterIiRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/settings-ii': typeof SettingsIiRoute
   '/warehouse': typeof WarehouseRoute
+  '/warehouse-ii': typeof WarehouseIiRoute
+  '/dField-ii/$id': typeof DFieldIiIdRoute
   '/dField/$id': typeof DFieldIdRoute
+  '/dWarehouse-ii/$id': typeof DWarehouseIiIdRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/cycle': typeof CycleRoute
+  '/cycle-ii': typeof CycleIiRoute
   '/dCycle': typeof DCycleRoute
+  '/dCycle-ii': typeof DCycleIiRoute
   '/dWarehouse': typeof DWarehouseRoute
   '/dashboard': typeof DashboardRoute
+  '/dashboard-ii': typeof DashboardIiRoute
   '/ddWarehouse': typeof DdWarehouseRoute
   '/field': typeof FieldRoute
+  '/field-ii': typeof FieldIiRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/formCycle': typeof FormCycleRoute
   '/formField': typeof FormFieldRoute
+  '/formField-ii': typeof FormFieldIiRoute
   '/login': typeof LoginRoute
+  '/login-ii': typeof LoginIiRoute
   '/profile': typeof ProfileRoute
+  '/profile-ii': typeof ProfileIiRoute
   '/register': typeof RegisterRoute
+  '/register-ii': typeof RegisterIiRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/settings-ii': typeof SettingsIiRoute
   '/warehouse': typeof WarehouseRoute
+  '/warehouse-ii': typeof WarehouseIiRoute
+  '/dField-ii/$id': typeof DFieldIiIdRoute
   '/dField/$id': typeof DFieldIdRoute
+  '/dWarehouse-ii/$id': typeof DWarehouseIiIdRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/cycle'
+    | '/cycle-ii'
     | '/dCycle'
+    | '/dCycle-ii'
     | '/dWarehouse'
     | '/dashboard'
+    | '/dashboard-ii'
     | '/ddWarehouse'
     | '/field'
+    | '/field-ii'
+    | '/forgot-password'
     | '/formCycle'
     | '/formField'
+    | '/formField-ii'
     | '/login'
+    | '/login-ii'
     | '/profile'
+    | '/profile-ii'
     | '/register'
+    | '/register-ii'
+    | '/reset-password'
+    | '/settings-ii'
     | '/warehouse'
+    | '/warehouse-ii'
+    | '/dField-ii/$id'
     | '/dField/$id'
+    | '/dWarehouse-ii/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/cycle'
+    | '/cycle-ii'
     | '/dCycle'
+    | '/dCycle-ii'
     | '/dWarehouse'
     | '/dashboard'
+    | '/dashboard-ii'
     | '/ddWarehouse'
     | '/field'
+    | '/field-ii'
+    | '/forgot-password'
     | '/formCycle'
     | '/formField'
+    | '/formField-ii'
     | '/login'
+    | '/login-ii'
     | '/profile'
+    | '/profile-ii'
     | '/register'
+    | '/register-ii'
+    | '/reset-password'
+    | '/settings-ii'
     | '/warehouse'
+    | '/warehouse-ii'
+    | '/dField-ii/$id'
     | '/dField/$id'
+    | '/dWarehouse-ii/$id'
   id:
     | '__root__'
     | '/'
     | '/cycle'
+    | '/cycle-ii'
     | '/dCycle'
+    | '/dCycle-ii'
     | '/dWarehouse'
     | '/dashboard'
+    | '/dashboard-ii'
     | '/ddWarehouse'
     | '/field'
+    | '/field-ii'
+    | '/forgot-password'
     | '/formCycle'
     | '/formField'
+    | '/formField-ii'
     | '/login'
+    | '/login-ii'
     | '/profile'
+    | '/profile-ii'
     | '/register'
+    | '/register-ii'
+    | '/reset-password'
+    | '/settings-ii'
     | '/warehouse'
+    | '/warehouse-ii'
+    | '/dField-ii/$id'
     | '/dField/$id'
+    | '/dWarehouse-ii/$id'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CycleRoute: typeof CycleRoute
+  CycleIiRoute: typeof CycleIiRoute
   DCycleRoute: typeof DCycleRoute
+  DCycleIiRoute: typeof DCycleIiRoute
   DWarehouseRoute: typeof DWarehouseRoute
   DashboardRoute: typeof DashboardRoute
+  DashboardIiRoute: typeof DashboardIiRoute
   DdWarehouseRoute: typeof DdWarehouseRoute
   FieldRoute: typeof FieldRoute
+  FieldIiRoute: typeof FieldIiRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   FormCycleRoute: typeof FormCycleRoute
   FormFieldRoute: typeof FormFieldRoute
+  FormFieldIiRoute: typeof FormFieldIiRoute
   LoginRoute: typeof LoginRoute
+  LoginIiRoute: typeof LoginIiRoute
   ProfileRoute: typeof ProfileRoute
+  ProfileIiRoute: typeof ProfileIiRoute
   RegisterRoute: typeof RegisterRoute
+  RegisterIiRoute: typeof RegisterIiRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SettingsIiRoute: typeof SettingsIiRoute
   WarehouseRoute: typeof WarehouseRoute
+  WarehouseIiRoute: typeof WarehouseIiRoute
+  DFieldIiIdRoute: typeof DFieldIiIdRoute
   DFieldIdRoute: typeof DFieldIdRoute
+  DWarehouseIiIdRoute: typeof DWarehouseIiIdRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/warehouse-ii': {
+      id: '/warehouse-ii'
+      path: '/warehouse-ii'
+      fullPath: '/warehouse-ii'
+      preLoaderRoute: typeof WarehouseIiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/warehouse': {
+      id: '/warehouse'
+      path: '/warehouse'
+      fullPath: '/warehouse'
+      preLoaderRoute: typeof WarehouseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings-ii': {
+      id: '/settings-ii'
+      path: '/settings-ii'
+      fullPath: '/settings-ii'
+      preLoaderRoute: typeof SettingsIiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register-ii': {
+      id: '/register-ii'
+      path: '/register-ii'
+      fullPath: '/register-ii'
+      preLoaderRoute: typeof RegisterIiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile-ii': {
+      id: '/profile-ii'
+      path: '/profile-ii'
+      fullPath: '/profile-ii'
+      preLoaderRoute: typeof ProfileIiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login-ii': {
+      id: '/login-ii'
+      path: '/login-ii'
+      fullPath: '/login-ii'
+      preLoaderRoute: typeof LoginIiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/formField-ii': {
+      id: '/formField-ii'
+      path: '/formField-ii'
+      fullPath: '/formField-ii'
+      preLoaderRoute: typeof FormFieldIiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/formField': {
+      id: '/formField'
+      path: '/formField'
+      fullPath: '/formField'
+      preLoaderRoute: typeof FormFieldRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/formCycle': {
+      id: '/formCycle'
+      path: '/formCycle'
+      fullPath: '/formCycle'
+      preLoaderRoute: typeof FormCycleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/field-ii': {
+      id: '/field-ii'
+      path: '/field-ii'
+      fullPath: '/field-ii'
+      preLoaderRoute: typeof FieldIiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/field': {
+      id: '/field'
+      path: '/field'
+      fullPath: '/field'
+      preLoaderRoute: typeof FieldRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ddWarehouse': {
+      id: '/ddWarehouse'
+      path: '/ddWarehouse'
+      fullPath: '/ddWarehouse'
+      preLoaderRoute: typeof DdWarehouseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard-ii': {
+      id: '/dashboard-ii'
+      path: '/dashboard-ii'
+      fullPath: '/dashboard-ii'
+      preLoaderRoute: typeof DashboardIiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dWarehouse': {
+      id: '/dWarehouse'
+      path: '/dWarehouse'
+      fullPath: '/dWarehouse'
+      preLoaderRoute: typeof DWarehouseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dCycle-ii': {
+      id: '/dCycle-ii'
+      path: '/dCycle-ii'
+      fullPath: '/dCycle-ii'
+      preLoaderRoute: typeof DCycleIiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dCycle': {
+      id: '/dCycle'
+      path: '/dCycle'
+      fullPath: '/dCycle'
+      preLoaderRoute: typeof DCycleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cycle-ii': {
+      id: '/cycle-ii'
+      path: '/cycle-ii'
+      fullPath: '/cycle-ii'
+      preLoaderRoute: typeof CycleIiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cycle': {
+      id: '/cycle'
+      path: '/cycle'
+      fullPath: '/cycle'
+      preLoaderRoute: typeof CycleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dWarehouse-ii/$id': {
+      id: '/dWarehouse-ii/$id'
+      path: '/dWarehouse-ii/$id'
+      fullPath: '/dWarehouse-ii/$id'
+      preLoaderRoute: typeof DWarehouseIiIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dField/$id': {
+      id: '/dField/$id'
+      path: '/dField/$id'
+      fullPath: '/dField/$id'
+      preLoaderRoute: typeof DFieldIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dField-ii/$id': {
+      id: '/dField-ii/$id'
+      path: '/dField-ii/$id'
+      fullPath: '/dField-ii/$id'
+      preLoaderRoute: typeof DFieldIiIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CycleRoute: CycleRoute,
+  CycleIiRoute: CycleIiRoute,
   DCycleRoute: DCycleRoute,
+  DCycleIiRoute: DCycleIiRoute,
   DWarehouseRoute: DWarehouseRoute,
   DashboardRoute: DashboardRoute,
+  DashboardIiRoute: DashboardIiRoute,
   DdWarehouseRoute: DdWarehouseRoute,
   FieldRoute: FieldRoute,
+  FieldIiRoute: FieldIiRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   FormCycleRoute: FormCycleRoute,
   FormFieldRoute: FormFieldRoute,
+  FormFieldIiRoute: FormFieldIiRoute,
   LoginRoute: LoginRoute,
+  LoginIiRoute: LoginIiRoute,
   ProfileRoute: ProfileRoute,
+  ProfileIiRoute: ProfileIiRoute,
   RegisterRoute: RegisterRoute,
+  RegisterIiRoute: RegisterIiRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SettingsIiRoute: SettingsIiRoute,
   WarehouseRoute: WarehouseRoute,
+  WarehouseIiRoute: WarehouseIiRoute,
+  DFieldIiIdRoute: DFieldIiIdRoute,
   DFieldIdRoute: DFieldIdRoute,
+  DWarehouseIiIdRoute: DWarehouseIiIdRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/cycle",
-        "/dCycle",
-        "/dWarehouse",
-        "/dashboard",
-        "/ddWarehouse",
-        "/field",
-        "/formCycle",
-        "/formField",
-        "/login",
-        "/profile",
-        "/register",
-        "/warehouse",
-        "/dField/$id"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/cycle": {
-      "filePath": "cycle.tsx"
-    },
-    "/dCycle": {
-      "filePath": "dCycle.tsx"
-    },
-    "/dWarehouse": {
-      "filePath": "dWarehouse.tsx"
-    },
-    "/dashboard": {
-      "filePath": "dashboard.tsx"
-    },
-    "/ddWarehouse": {
-      "filePath": "ddWarehouse.tsx"
-    },
-    "/field": {
-      "filePath": "field.tsx"
-    },
-    "/formCycle": {
-      "filePath": "formCycle.tsx"
-    },
-    "/formField": {
-      "filePath": "formField.tsx"
-    },
-    "/login": {
-      "filePath": "login.tsx"
-    },
-    "/profile": {
-      "filePath": "profile.tsx"
-    },
-    "/register": {
-      "filePath": "register.tsx"
-    },
-    "/warehouse": {
-      "filePath": "warehouse.tsx"
-    },
-    "/dField/$id": {
-      "filePath": "dField.$id.tsx"
-    }
-  }
-}
-ROUTE_MANIFEST_END */

@@ -1,87 +1,48 @@
 import { Outlet, createRootRoute, useRouterState } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-// import Header from '@/components/Header'
 import { SidebarDs } from '@/components/Sidebar'
-import AgriCloudNavbar from '@/components/Header'
+import { PreferencesProvider } from '@/lib/preferences'
+
+// Halaman tanpa navigasi: auth/redirect + form full-page (mis. peta lahan).
+// Form pendek pakai modal jadi tetap di halaman list (sidebar tetap tampil).
+const NO_NAV_PATHS = [
+  '/',
+  '/login',
+  '/login-ii',
+  '/register',
+  '/register-ii',
+  '/forgot-password',
+  '/reset-password',
+  '/formField',
+  '/formField-ii',
+  '/formCycle',
+]
 
 export const Route = createRootRoute({
   component: () => {
     const { location } = useRouterState()
 
-    const basePathsHide = [
-      '/login',
-      '/login/',
-      '/register',
-      '/register/',
-      '/cycle',
-      '/cycle/',
-      '/crop',
-      '/crop/',
-      '/warehouse',
-      '/warehouse/',
-      '/field',
-      '/field/',
-      '/formCycle',
-      '/formCycle/',
-      '/formField',
-      '/formField/',
-      '/dField',
-      '/dField/',
-      '/dCycle',
-      '/dCycle/',
-      '/dWarehouse',
-      '/dWarehouse/',
-      '/profile',
-      '/profile/',
-      '/'
-    ]
-
-
-
-    const basePaths = [
-      '/cycle',
-      '/cycle/',
-      '/crop',
-      '/crop/',
-      '/warehouse',
-      '/warehouse/',
-      '/field',
-      '/field/',
-      '/dField',
-      '/dField/',
-      '/dCycle',
-      '/dCycle/',
-      '/dWarehouse',
-      '/dWarehouse/',
-      '/ddWarehouse',
-      '/ddWarehouse/',
-      '/profile',
-      '/profile/',
-      '/eProfile/',
-      '/eProfile/$id',
-      
-    ]
-
-    const showHeader = basePaths.some(path => 
-  location.pathname === path || location.pathname.startsWith(`${path}/`)
-); 
-
-    const hideHeader = basePathsHide.some(path => 
-  location.pathname === path || location.pathname.startsWith(`${path}/`)
-); 
+    const hideNav = NO_NAV_PATHS.some(
+      (path) =>
+        location.pathname === path ||
+        location.pathname === `${path}/` ||
+        (path !== '/' && location.pathname.startsWith(`${path}/`)),
+    )
 
     return (
-      <>
-        {showHeader && <AgriCloudNavbar  currentPath={location.pathname} />}
-        <div className=" ">
-          {!hideHeader && <SidebarDs />}
+      <PreferencesProvider>
+        {!hideNav && <SidebarDs />}
+        {/* SATU-SATUNYA tempat offset konten selebar sidebar (280px = lebar `aside`
+            di Sidebar.tsx). Di mobile sidebar jadi drawer, konten full-width.
+            ⚠️ Halaman JANGAN menambah `md:ml-[280px]`/`pl-[280px]` sendiri —
+            nanti dobel offset (lihat bug gap putih). Root yang pegang ini. */}
+        <main className={hideNav ? '' : 'md:pl-[280px]'}>
           <Outlet />
-          
-        </div>
+        </main>
 
         <TanStackRouterDevtools />
-      </>
+      </PreferencesProvider>
     )
   },
-}) 
+})

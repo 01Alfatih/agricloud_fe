@@ -1,36 +1,48 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { Bell, Home, Layers, Leaf, Warehouse } from "lucide-react"
-import { useEffect } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { Bell, Home, Layers, Leaf, Warehouse } from 'lucide-react'
+import { useEffect } from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 
 type NavbarProps = {
-  currentPath: string;
-  label: string;
-  icon: React.ReactNode;
-  to: string;
-  active: boolean;
-};
+  currentPath: string
+  label: string
+  icon: React.ReactNode
+  to: string
+  active: boolean
+}
 
 export default function AgriCloudNavbar({ currentPath }: NavbarProps) {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const getToken = async () => {
-    const token = await localStorage.getItem("token");
+    const token = await localStorage.getItem('token')
     if (!token) {
-      navigate({ to: '/login' });
+      navigate({ to: '/login' })
     }
   }
   useEffect(() => {
-    getToken();
+    getToken()
   }, [])
 
   const navItems = [
-    { label: "Dashboard", paths: ["/dashboard"], icon: <Home size={20} /> },
-    { label: "Lahan", paths: ["/field", "/dfield"], icon: <Layers size={20} /> },
-    { label: "Tanaman", paths: ["/cycle", "/dCycle", "/tanaman"], icon: <Leaf size={20} /> },
-    { label: "Gudang", paths: ["/warehouse", "/storage"], icon: <Warehouse size={20} /> }
-  ];
+    { label: 'Dashboard', paths: ['/dashboard'], icon: <Home size={20} /> },
+    {
+      label: 'Lahan',
+      paths: ['/field', '/dfield'],
+      icon: <Layers size={20} />,
+    },
+    {
+      label: 'Tanaman',
+      paths: ['/cycle', '/dCycle', '/tanaman'],
+      icon: <Leaf size={20} />,
+    },
+    {
+      label: 'Gudang',
+      paths: ['/warehouse', '/storage'],
+      icon: <Warehouse size={20} />,
+    },
+  ]
 
   return (
     <div className="w-full bg-[#1a3b2a] text-white border-b border-[#2a4b3a] rounded-b-2xl">
@@ -38,7 +50,7 @@ export default function AgriCloudNavbar({ currentPath }: NavbarProps) {
         <div className="h-16 flex items-center justify-between">
           {/* Logo and Brand */}
           <div className="flex items-center gap-2">
-            <img src="/logo1.png" alt="" className='w-40' />
+            <img src="/logo1.png" alt="" className="w-40" />
           </div>
 
           {/* Navigation */}
@@ -62,7 +74,7 @@ export default function AgriCloudNavbar({ currentPath }: NavbarProps) {
                 <AvatarImage src="https://i.pravatar.cc/100" alt="User" />
                 <AvatarFallback>asdassddasd</AvatarFallback>
               </Avatar>
-              </Link>
+            </Link>
           </div>
         </div>
       </div>
@@ -83,12 +95,18 @@ function NavItem({ label, active, to, icon }: NavItemProps) {
   return (
     <Link to={to}>
       {active ? (
-        <Button variant="secondary" className="bg-[#4a8c64] hover:bg-[#5a9c74] text-white rounded-md flex items-center gap-2">
+        <Button
+          variant="secondary"
+          className="bg-[#4a8c64] hover:bg-[#5a9c74] text-white rounded-md flex items-center gap-2"
+        >
           {icon}
           {label}
         </Button>
       ) : (
-        <Button variant="ghost" className="text-white hover:bg-[#2a4b3a] flex items-center gap-2">
+        <Button
+          variant="ghost"
+          className="text-white hover:bg-[#2a4b3a] flex items-center gap-2"
+        >
           {icon}
           {label}
         </Button>

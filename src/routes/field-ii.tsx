@@ -1,14 +1,24 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { MapPin, Pencil, Plus, Search, Sprout, Square } from 'lucide-react'
+import {
+  MapPin,
+  Pencil,
+  Plus,
+  Search,
+  Sprout,
+  Square,
+  Trash2,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { Pagination } from '@/components/ui/pagination'
+import { usePagination } from '@/hooks/usePagination'
 import { reverseGeocode } from '@/utils/reversGeocode'
 import { formatArea } from '@/lib/format'
-import { cropTags } from '@/lib/crops'
 import type { FieldCrop } from '@/lib/crops'
 import { FormFieldModal } from '@/components/FormFieldModal'
 import type { FieldInitialData } from '@/components/FormFieldModal'
@@ -214,6 +224,30 @@ function RouteComponent() {
     }
   }
 
+  // Hapus lahan → DELETE /api/myfields/{id}, lalu refresh list.
+  const handleDelete = async (land: Ifield) => {
+    // Lahan dummy preview (id negatif) tidak punya record di backend.
+    if (land.id < 0) {
+      toast.error('Lahan contoh tidak bisa dihapus.')
+      return
+    }
+    const ok = window.confirm(
+      `Hapus lahan "${land.name}"? Tindakan ini tidak bisa dibatalkan.`,
+    )
+    if (!ok) return
+
+    try {
+      await axios.delete(`http://localhost:8005/api/myfields/${land.id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      })
+      toast.success(`Lahan "${land.name}" dihapus.`)
+      fetchData()
+    } catch (error) {
+      console.error('Gagal menghapus lahan:', error)
+      toast.error('Gagal menghapus lahan. Coba lagi.')
+    }
+  }
+
   useEffect(() => {
     fetchData()
   }, [])
@@ -221,6 +255,9 @@ function RouteComponent() {
   const filtered = fields.filter((f) =>
     f.name.toLowerCase().includes(query.toLowerCase()),
   )
+
+  const { page, setPage, totalPages, pageItems, total, from, to } =
+    usePagination(filtered, 9)
 
   return (
     <div className="min-h-screen w-full bg-gray-50 dark:bg-[#0c1410]">
@@ -294,11 +331,7 @@ function RouteComponent() {
                   <FieldCardSkeleton />
                 </>
               ) : (
-                filtered.map((land) => {
-                  const crops = cropTags(
-                    land.crops,
-                    `${land.name} ${land.description}`,
-                  )
+                pageItems.map((land) => {
                   return (
                     <Card
                       key={land.id}
@@ -313,33 +346,27 @@ function RouteComponent() {
                       >
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-                        {/* Badge tanaman — dukung tumpang sari: maks 2 + "+N" */}
-                        <div className="absolute top-3 left-3 flex max-w-[80%] flex-wrap gap-1.5">
-                          {crops.slice(0, 2).map((crop) => (
-                            <Badge
-                              key={crop.label}
-                              className="gap-1 bg-white/90 text-gray-800 shadow-sm hover:bg-white"
-                            >
-                              <span>{crop.icon}</span>
-                              {crop.label}
-                            </Badge>
-                          ))}
-                          {crops.length > 2 && (
-                            <Badge className="bg-black/55 text-white shadow-sm hover:bg-black/55">
-                              +{crops.length - 2}
-                            </Badge>
-                          )}
+                        {/* Aksi: edit & hapus lahan */}
+                        <div className="absolute top-3 right-3 flex gap-1.5">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openEdit(land)}
+                            aria-label={`Edit ${land.name}`}
+                            className="h-8 w-8 rounded-full bg-black/30 p-0 text-white backdrop-blur-sm hover:bg-black/55"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(land)}
+                            aria-label={`Hapus ${land.name}`}
+                            className="h-8 w-8 rounded-full bg-black/30 p-0 text-white backdrop-blur-sm hover:bg-red-600"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
-
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openEdit(land)}
-                          aria-label={`Edit ${land.name}`}
-                          className="absolute top-3 right-3 h-8 w-8 rounded-full p-0 text-white hover:bg-white/20"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
 
                         {/* Nama lahan di atas gambar */}
                         <h3 className="absolute right-3 bottom-3 left-3 truncate text-lg font-semibold text-white drop-shadow">
@@ -380,18 +407,18 @@ function RouteComponent() {
                           </Badge>
                         </div>
 
-                        {/* Status tanam — ringkasan siklus aktif (§12) */}
+                        {/* Tanaman aktif — badge fase + progress siklus (§12) */}
                         {land.active_cycle?.plant_name ? (
-                          <div className="mb-4 rounded-lg bg-green-500/10 px-3 py-2 dark:bg-green-500/10">
-                            <div className="flex items-center justify-between gap-2 text-sm">
-                              <span className="flex min-w-0 items-center gap-1.5 font-medium text-green-800 dark:text-green-300">
-                                <Sprout className="h-4 w-4 shrink-0" />
-                                <span className="truncate">
+                          <div className="mb-4">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <Badge className="gap-1 border-0 bg-green-500/10 font-medium text-green-700 hover:bg-green-500/10 dark:bg-green-500/15 dark:text-green-300">
+                                <Sprout className="h-3.5 w-3.5" />
+                                <span className="max-w-[10rem] truncate">
                                   {land.active_cycle.plant_name}
                                 </span>
-                              </span>
+                              </Badge>
                               {land.active_cycle.phase && (
-                                <Badge className="shrink-0 border-0 bg-green-600/90 text-xs text-white hover:bg-green-600/90">
+                                <Badge className="border-0 bg-green-600/90 text-xs text-white hover:bg-green-600/90">
                                   {land.active_cycle.phase}
                                 </Badge>
                               )}
@@ -408,9 +435,11 @@ function RouteComponent() {
                             )}
                           </div>
                         ) : (
-                          <div className="mb-4 flex items-center gap-1.5 rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-500 dark:bg-white/5 dark:text-gray-400">
-                            <Sprout className="h-4 w-4 shrink-0" />
-                            Belum ada tanam
+                          <div className="mb-4">
+                            <Badge className="gap-1 border-0 bg-gray-100 font-medium text-gray-500 hover:bg-gray-100 dark:bg-white/5 dark:text-gray-400">
+                              <Sprout className="h-3.5 w-3.5" />
+                              Belum ada tanam
+                            </Badge>
                           </div>
                         )}
 
@@ -451,6 +480,16 @@ function RouteComponent() {
                 </button>
               )}
             </div>
+
+            {/* Pagination */}
+            {!loading && filtered.length > 0 && (
+              <Pagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                summary={`Menampilkan ${from}–${to} dari ${total} lahan`}
+              />
+            )}
 
             {/* Empty state hasil pencarian */}
             {!loading && fields.length > 0 && filtered.length === 0 && (

@@ -286,7 +286,7 @@ function RouteComponent() {
       <div className="relative z-10 mx-auto -mt-10 max-w-6xl space-y-6 px-4 pb-16 sm:px-6 lg:px-10">
         {/* Action bar — sambungan ke alur siklus tanam */}
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-          <Link to="/cycle-ii">
+          <Link to="/cycle-ii" search={{ field_id: field.id }}>
             <Button
               variant="outline"
               className="w-full gap-2 rounded-full border-[#0B4619] text-[#0B4619] hover:bg-green-50 sm:w-auto dark:border-white/15 dark:text-[#a7d1a7] dark:hover:bg-white/5"
@@ -324,8 +324,8 @@ function RouteComponent() {
               >
                 <FactTile
                   icon={MapPin}
-                  label="Koordinat (buka peta)"
-                  value={`${field.location.latitude}, ${field.location.longitude}`}
+                  label="Lokasi (buka peta)"
+                  value={field.address || 'Memuat alamat…'}
                   iconClass="bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-300"
                 />
               </a>

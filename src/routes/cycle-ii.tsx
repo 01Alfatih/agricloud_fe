@@ -31,14 +31,19 @@ interface IPlant extends ICropMeta {
 interface ICropTemplateResponse {
   id: number
   name: string
-  description: string
+  description: string | null
+  // Metadata dari backend (CropTemplate-Metadata) — semua nullable, kalau kosong
+  // FE fallback ke tebakan `decorateCrop` dari nama.
+  thumbnail?: string | null
+  category?: string | null
+  growth_days?: number | null
 }
 
-// Metadata tanaman diturunkan dari nama. Crop-template dari API baru kirim
-// id/name/description (tanpa thumbnail, kategori, umur panen, tingkat
-// perawatan), jadi sementara dipetakan di FE sampai backend menyediakannya —
-// lihat PESAN-BACKEND.md §10. Tanaman tanpa foto pakai placeholder gradient +
-// emoji (bukan foto sawah yang menyesatkan).
+// Metadata tanaman. Backend `GET /api/crop-templates` kini mengirim
+// thumbnail/category/growth_days (tiket CropTemplate-Metadata, semua nullable),
+// dan FE memprioritaskannya. `decorateCrop` di bawah dipertahankan untuk emoji
+// `icon` (belum dikirim backend) + fallback saat field backend null. Tanaman
+// tanpa foto pakai placeholder gradient + emoji (bukan foto sawah menyesatkan).
 const CROP_RULES: Array<{ match: Array<string>; meta: ICropMeta }> = [
   {
     match: ['cabai', 'cabe'],
@@ -308,14 +313,22 @@ function RouteComponent() {
           },
         })
 
-        const enriched: Array<IPlant> = response.data.data.map((tpl) => ({
-          id: tpl.id,
-          name: tpl.name,
-          description: tpl.description,
-          land: placeholderLand(tpl.id),
-          progress: placeholderProgress(tpl.id),
-          ...decorateCrop(tpl.name),
-        }))
+        const enriched: Array<IPlant> = response.data.data.map((tpl) => {
+          // Tebakan dari nama sebagai fallback (icon + saat field backend null).
+          const guess = decorateCrop(tpl.name)
+          return {
+            id: tpl.id,
+            name: tpl.name,
+            description: tpl.description ?? '',
+            land: placeholderLand(tpl.id),
+            progress: placeholderProgress(tpl.id),
+            ...guess,
+            // Utamakan metadata real dari backend; null → pakai tebakan.
+            image: tpl.thumbnail ?? guess.image,
+            category: tpl.category ?? guess.category,
+            growthDays: tpl.growth_days ?? guess.growthDays,
+          }
+        })
 
         // Kalau API belum ngembaliin tanaman, pakai dummy buat preview.
         setPlants(enriched.length > 0 ? enriched : DUMMY_PLANTS)

@@ -2,6 +2,7 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import {
   ArrowDownLeft,
   ArrowLeft,
+  ArrowLeftRight,
   ArrowUpRight,
   Boxes,
   Calendar,
@@ -13,8 +14,16 @@ import {
   User,
   Warehouse as WarehouseIcon,
 } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ComponentType } from 'react'
-import { useMemo, useState } from 'react'
+import type { Movement } from '@/components/FormItemModal'
+import type {
+  IItem,
+  IMovementResponse,
+  IWarehouse,
+  IWarehouseResponse,
+  MovementDirection,
+} from '@/lib/warehouse'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -27,15 +36,23 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Pagination } from '@/components/ui/pagination'
+import { usePagination } from '@/hooks/usePagination'
 import { cn } from '@/lib/utils'
-import { FormItemModal, type ItemFormResult } from '@/components/FormItemModal'
+import { FormItemModal } from '@/components/FormItemModal'
+import { api } from '@/lib/api'
+import {
+  formatDate,
+  localityLabel,
+  mapWarehouse,
+  usagePercent,
+} from '@/lib/warehouse'
 
 export const Route = createFileRoute('/dWarehouse-ii/$id')({
   component: RouteComponent,
 })
 
 /* ---------------------------------- data ---------------------------------- */
-// NOTE: semua dummy/hardcoded — siap disambung ke API per scope nanti.
 
 type Tone = 'success' | 'warning' | 'danger' | 'info' | 'neutral'
 
@@ -57,124 +74,25 @@ const barStyles: Record<'success' | 'warning' | 'danger', string> = {
   danger: 'bg-red-500',
 }
 
-interface IWarehouse {
-  id: number
-  name: string
-  address: string
-  capacity: number
-  items: number
-  owner: string
-  thumbnail?: string
-}
-
-const WAREHOUSES: Record<string, IWarehouse> = {
-  '1': {
-    id: 1,
-    name: 'Gudang 1',
-    address: 'Brebes, Jl. Netral',
-    capacity: 600,
-    items: 500,
-    owner: 'Yoyo',
-    thumbnail: '/lahan.png',
-  },
-  '2': {
-    id: 2,
-    name: 'Gudang 2',
-    address: 'Brebes, Jl. Netral',
-    capacity: 900,
-    items: 500,
-    owner: 'Yoyo',
-    thumbnail: '/lahan1.png',
-  },
-  '3': {
-    id: 3,
-    name: 'Gudang 3',
-    address: 'Brebes, Jl. Netral',
-    capacity: 1800,
-    items: 500,
-    owner: 'Yoyo',
-    thumbnail: '/bg-dashboard.png',
-  },
-}
-
-// Jenis barang → warna badge (tone dark-aware).
+// Jenis barang → warna badge (tone dark-aware). Default 'info' bila tak dikenal.
 const ITEM_TYPE_TONE: Record<string, Tone> = {
   Pupuk: 'warning',
   Bibit: 'success',
   Pestisida: 'danger',
+  Obat: 'danger',
   Alat: 'info',
   'Hasil Panen': 'neutral',
 }
 
-type Movement = 'Masuk' | 'Keluar'
-
+// Baris riwayat hasil transformasi dari MovementResource backend.
 interface IInventoryRow {
   id: number
   date: string
   itemName: string
   qty: number
   type: string
-  movement: Movement
+  direction: MovementDirection
 }
-
-const INVENTORY: Array<IInventoryRow> = [
-  {
-    id: 1,
-    date: '02/06/2026',
-    itemName: 'Pupuk NPK Mutiara',
-    qty: 120,
-    type: 'Pupuk',
-    movement: 'Masuk',
-  },
-  {
-    id: 2,
-    date: '28/05/2026',
-    itemName: 'Benih Cabai Merah',
-    qty: 50,
-    type: 'Bibit',
-    movement: 'Masuk',
-  },
-  {
-    id: 3,
-    date: '20/05/2026',
-    itemName: 'Pestisida Decis',
-    qty: 18,
-    type: 'Pestisida',
-    movement: 'Masuk',
-  },
-  {
-    id: 4,
-    date: '14/05/2026',
-    itemName: 'Hasil Panen Cabai',
-    qty: 230,
-    type: 'Hasil Panen',
-    movement: 'Keluar',
-  },
-  {
-    id: 5,
-    date: '08/05/2026',
-    itemName: 'Cangkul & Sprayer',
-    qty: 12,
-    type: 'Alat',
-    movement: 'Masuk',
-  },
-  {
-    id: 6,
-    date: '02/05/2026',
-    itemName: 'Pupuk Organik',
-    qty: 80,
-    type: 'Pupuk',
-    movement: 'Keluar',
-  },
-  {
-    id: 7,
-    date: '24/04/2026',
-    itemName: 'Benih Tomat',
-    qty: 40,
-    type: 'Bibit',
-    movement: 'Keluar',
-  },
-]
 
 /* -------------------------------- partials -------------------------------- */
 
@@ -213,14 +131,22 @@ function StatTile({
   )
 }
 
-function MovementBadge({ movement }: { movement: Movement }) {
-  return movement === 'Masuk' ? (
-    <Badge className={cn('gap-1', toneStyles.success)}>
-      <ArrowDownLeft className="h-3 w-3" /> Masuk
-    </Badge>
-  ) : (
-    <Badge className={cn('gap-1', toneStyles.danger)}>
-      <ArrowUpRight className="h-3 w-3" /> Keluar
+function MovementBadge({ direction }: { direction: MovementDirection }) {
+  if (direction === 'Masuk')
+    return (
+      <Badge className={cn('gap-1', toneStyles.success)}>
+        <ArrowDownLeft className="h-3 w-3" /> Masuk
+      </Badge>
+    )
+  if (direction === 'Keluar')
+    return (
+      <Badge className={cn('gap-1', toneStyles.danger)}>
+        <ArrowUpRight className="h-3 w-3" /> Keluar
+      </Badge>
+    )
+  return (
+    <Badge className={cn('gap-1', toneStyles.info)}>
+      <ArrowLeftRight className="h-3 w-3" /> Transfer
     </Badge>
   )
 }
@@ -231,32 +157,66 @@ function RouteComponent() {
   const { id } = Route.useParams()
   const [query, setQuery] = useState('')
 
-  const [inventory, setInventory] = useState<Array<IInventoryRow>>(INVENTORY)
+  const [warehouse, setWarehouse] = useState<IWarehouse | null>(null)
+  const [items, setItems] = useState<Array<IItem>>([])
+  const [inventory, setInventory] = useState<Array<IInventoryRow>>([])
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
   // null = modal tertutup; selain itu = arah transaksi yang sedang dibuka.
   const [itemModal, setItemModal] = useState<Movement | null>(null)
 
-  // Tambahkan transaksi baru ke atas riwayat (data lokal; backend belum ada).
-  const handleSaveItem = (data: ItemFormResult) => {
-    setInventory((prev) => {
-      const nextId = prev.reduce((max, r) => Math.max(max, r.id), 0) + 1
-      return [{ id: nextId, ...data }, ...prev]
-    })
+  // Ambil detail gudang + daftar barang + riwayat transaksi sekaligus.
+  const fetchData = async () => {
+    setLoading(true)
+    try {
+      const [whRes, itemsRes, movRes] = await Promise.all([
+        api.get<{ data: IWarehouseResponse }>(`/warehouses/${id}`),
+        api.get<{ data: Array<IItem> }>(`/warehouses/${id}/items`),
+        api.get<{ data: Array<IMovementResponse> }>(
+          `/warehouses/${id}/movements`,
+        ),
+      ])
+      setWarehouse(mapWarehouse(whRes.data.data))
+      setItems(itemsRes.data.data)
+      setInventory(
+        movRes.data.data.map((m, i) => ({
+          id: i,
+          date: formatDate(m.created_at),
+          itemName: m.item_name ?? '—',
+          qty: m.qty,
+          type: m.category ?? 'Lainnya',
+          direction: m.direction,
+        })),
+      )
+      setNotFound(false)
+    } catch (error) {
+      console.error('Gagal memuat gudang:', error)
+      setNotFound(true)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const warehouse = WAREHOUSES[id] ?? WAREHOUSES['1']
-  const usage = Math.min(
-    100,
-    Math.round((warehouse.items / warehouse.capacity) * 100),
+  useEffect(() => {
+    fetchData()
+  }, [id])
+
+  // Total stok aktual = Σ stok semua barang (lebih akurat dari items_count).
+  const totalStock = useMemo(
+    () => items.reduce((s, it) => s + it.stock, 0),
+    [items],
   )
+
+  const usage = warehouse ? usagePercent(totalStock, warehouse.capacity) : 0
   const usageTone: 'success' | 'warning' | 'danger' =
     usage >= 80 ? 'danger' : usage >= 55 ? 'warning' : 'success'
 
   const stats = useMemo(() => {
     const masuk = inventory
-      .filter((r) => r.movement === 'Masuk')
+      .filter((r) => r.direction === 'Masuk')
       .reduce((s, r) => s + r.qty, 0)
     const keluar = inventory
-      .filter((r) => r.movement === 'Keluar')
+      .filter((r) => r.direction === 'Keluar')
       .reduce((s, r) => s + r.qty, 0)
     return { masuk, keluar }
   }, [inventory])
@@ -266,6 +226,41 @@ function RouteComponent() {
       r.itemName.toLowerCase().includes(query.toLowerCase()) ||
       r.type.toLowerCase().includes(query.toLowerCase()),
   )
+
+  const itemsPg = usePagination(items, 10)
+  const invPg = usePagination(filtered, 10)
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center bg-[#e4f0e4] dark:bg-[#0c1410]">
+        <div className="flex flex-col items-center gap-3 text-[#1a472a] dark:text-[#a7d1a7]">
+          <WarehouseIcon className="h-10 w-10 animate-pulse" />
+          <p className="text-sm">Memuat gudang…</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (notFound || !warehouse) {
+    return (
+      <div className="flex min-h-screen w-full flex-col items-center justify-center gap-4 bg-[#e4f0e4] px-6 text-center dark:bg-[#0c1410]">
+        <WarehouseIcon className="h-12 w-12 text-gray-300 dark:text-white/15" />
+        <div>
+          <p className="font-semibold text-[#1a472a] dark:text-[#a7d1a7]">
+            Gudang tidak ditemukan
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Gudang tidak ada atau bukan milik Anda.
+          </p>
+        </div>
+        <Link to="/warehouse-ii">
+          <Button className="gap-2 rounded-full bg-[#0B4619] text-white hover:bg-[#2a7039] dark:bg-[#5cbb70] dark:text-[#0c1410]">
+            <ArrowLeft className="h-4 w-4" /> Kembali ke Daftar Gudang
+          </Button>
+        </Link>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen w-full bg-[#e4f0e4] dark:bg-[#0c1410]">
@@ -312,7 +307,7 @@ function RouteComponent() {
             <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-white/90 drop-shadow">
               <span className="flex items-center gap-1.5">
                 <MapPin className="h-4 w-4 shrink-0" />
-                {warehouse.address}
+                {localityLabel(warehouse.address)}
               </span>
               <span className="flex items-center gap-1.5">
                 <User className="h-4 w-4 shrink-0" />
@@ -355,7 +350,7 @@ function RouteComponent() {
               />
             </div>
             <p className="text-xs text-gray-400 dark:text-gray-500">
-              {warehouse.items} dari {warehouse.capacity} unit
+              {totalStock} dari {warehouse.capacity} unit
             </p>
           </CardContent>
         </Card>
@@ -364,14 +359,14 @@ function RouteComponent() {
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <StatTile
             icon={Boxes}
-            label="Total Barang"
-            value={`${warehouse.items}`}
+            label="Total Stok"
+            value={`${totalStock}`}
             tone="success"
           />
           <StatTile
             icon={Package}
-            label="Jenis Transaksi"
-            value={`${inventory.length}`}
+            label="Jenis Barang"
+            value={`${items.length}`}
             tone="info"
           />
           <StatTile
@@ -404,6 +399,109 @@ function RouteComponent() {
             <PackagePlus className="h-4 w-4" /> Tambah Barang
           </Button>
         </div>
+
+        {/* Stok Barang — daftar barang yang ada di gudang ini (bukan riwayat) */}
+        <Card className="rounded-xl bg-white shadow-sm dark:bg-[#15211a] dark:border-white/10">
+          <CardContent className="space-y-4 p-4 sm:p-5">
+            <h3 className="flex items-center gap-2 text-base font-semibold text-[#1a472a] dark:text-[#a7d1a7]">
+              <Boxes className="h-4 w-4" /> Stok Barang
+            </h3>
+
+            {items.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center text-gray-500 dark:text-gray-400">
+                <Package className="mb-3 h-10 w-10 text-gray-300 dark:text-white/15" />
+                <p className="font-medium">Belum ada barang</p>
+                <p className="text-sm">
+                  Tambahkan barang untuk mulai mengisi gudang ini.
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Tabel (desktop) */}
+                <div className="hidden overflow-x-auto md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="dark:border-white/10">
+                        <TableHead className="text-xs text-gray-500 dark:text-gray-400">
+                          Nama Barang
+                        </TableHead>
+                        <TableHead className="text-xs text-gray-500 dark:text-gray-400">
+                          Jenis
+                        </TableHead>
+                        <TableHead className="text-right text-xs text-gray-500 dark:text-gray-400">
+                          Stok
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {itemsPg.pageItems.map((it) => (
+                        <TableRow
+                          key={it.id}
+                          className="dark:border-white/10 dark:hover:bg-white/5"
+                        >
+                          <TableCell className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                            {it.name}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              className={cn(
+                                toneStyles[
+                                  ITEM_TYPE_TONE[it.category ?? ''] ?? 'info'
+                                ],
+                              )}
+                            >
+                              {it.category ?? 'Lainnya'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right text-sm text-gray-600 dark:text-gray-300">
+                            {it.stock} {it.unit}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Card list (mobile) */}
+                <div className="space-y-3 md:hidden">
+                  {itemsPg.pageItems.map((it) => (
+                    <div
+                      key={it.id}
+                      className="flex items-start justify-between gap-2 rounded-lg border border-gray-100 p-3 dark:border-white/10"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-gray-800 dark:text-gray-100">
+                          {it.name}
+                        </p>
+                        <div className="mt-1">
+                          <Badge
+                            className={cn(
+                              toneStyles[
+                                ITEM_TYPE_TONE[it.category ?? ''] ?? 'info'
+                              ],
+                            )}
+                          >
+                            {it.category ?? 'Lainnya'}
+                          </Badge>
+                        </div>
+                      </div>
+                      <span className="shrink-0 text-sm font-medium text-gray-600 dark:text-gray-300">
+                        {it.stock} {it.unit}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <Pagination
+                  page={itemsPg.page}
+                  totalPages={itemsPg.totalPages}
+                  onPageChange={itemsPg.setPage}
+                  summary={`Menampilkan ${itemsPg.from}–${itemsPg.to} dari ${itemsPg.total} barang`}
+                />
+              </>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Inventory */}
         <Card className="rounded-xl bg-white shadow-sm dark:bg-[#15211a] dark:border-white/10">
@@ -448,7 +546,7 @@ function RouteComponent() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtered.map((row) => (
+                  {invPg.pageItems.map((row) => (
                     <TableRow
                       key={row.id}
                       className="dark:border-white/10 dark:hover:bg-white/5"
@@ -472,7 +570,7 @@ function RouteComponent() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <MovementBadge movement={row.movement} />
+                        <MovementBadge direction={row.direction} />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -482,7 +580,7 @@ function RouteComponent() {
 
             {/* Card list (mobile) */}
             <div className="space-y-3 md:hidden">
-              {filtered.map((row) => (
+              {invPg.pageItems.map((row) => (
                 <div
                   key={row.id}
                   className="rounded-lg border border-gray-100 p-3 dark:border-white/10"
@@ -496,7 +594,7 @@ function RouteComponent() {
                         {row.date} · {row.qty} unit
                       </p>
                     </div>
-                    <MovementBadge movement={row.movement} />
+                    <MovementBadge direction={row.direction} />
                   </div>
                   <div className="mt-2">
                     <Badge
@@ -511,13 +609,24 @@ function RouteComponent() {
               ))}
             </div>
 
+            {filtered.length > 0 && (
+              <Pagination
+                page={invPg.page}
+                totalPages={invPg.totalPages}
+                onPageChange={invPg.setPage}
+                summary={`Menampilkan ${invPg.from}–${invPg.to} dari ${invPg.total} riwayat`}
+              />
+            )}
+
             {/* Empty state */}
             {filtered.length === 0 && (
               <div className="flex flex-col items-center justify-center py-12 text-center text-gray-500 dark:text-gray-400">
                 <Package className="mb-3 h-10 w-10 text-gray-300 dark:text-white/15" />
-                <p className="font-medium">Barang tidak ditemukan</p>
+                <p className="font-medium">Belum ada riwayat</p>
                 <p className="text-sm">
-                  Tidak ada barang yang cocok dengan “{query}”.
+                  {query
+                    ? `Tidak ada barang yang cocok dengan “${query}”.`
+                    : 'Catat transaksi masuk/keluar untuk mengisi riwayat.'}
                 </p>
               </div>
             )}
@@ -530,8 +639,9 @@ function RouteComponent() {
         open={itemModal !== null}
         onClose={() => setItemModal(null)}
         movement={itemModal ?? 'Masuk'}
-        suggestions={Array.from(new Set(inventory.map((r) => r.itemName)))}
-        onSave={handleSaveItem}
+        warehouseId={warehouse.id}
+        items={items}
+        onSaved={fetchData}
       />
     </div>
   )

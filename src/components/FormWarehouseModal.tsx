@@ -19,10 +19,12 @@ import {
   useMapEvents,
 } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
+import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { reverseGeocode } from '@/utils/reversGeocode'
+import { api } from '@/lib/api'
 
 const DEFAULT_CENTER: [number, number] = [-6.2, 106.81] // Jakarta
 const GREEN = '#16a34a'
@@ -101,25 +103,13 @@ export interface WarehouseInitialData {
   thumbnailUrl?: string | null
 }
 
-// Hasil yang dikirim balik ke pemanggil setelah simpan.
-export interface WarehouseFormResult {
-  id?: number
-  name: string
-  address: string
-  capacity: number
-  latitude: number | null
-  longitude: number | null
-  thumbnail: File | null
-  thumbnailUrl: string | null
-}
-
 interface FormWarehouseModalProps {
   open: boolean
   onClose: () => void
   // Kalau diisi → modal jadi mode EDIT, isian di-prefill.
   warehouse?: WarehouseInitialData
-  // Dipanggil dengan data gudang setelah berhasil divalidasi & disimpan.
-  onSave?: (data: WarehouseFormResult) => void
+  // Dipanggil setelah gudang berhasil disimpan ke backend (parent refetch).
+  onSaved?: () => void
 }
 
 type FieldError = Partial<
@@ -137,7 +127,7 @@ export function FormWarehouseModal({
   open,
   onClose,
   warehouse,
-  onSave,
+  onSaved,
 }: FormWarehouseModalProps) {
   const isEdit = !!warehouse
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -154,6 +144,7 @@ export function FormWarehouseModal({
 
   const [errors, setErrors] = useState<FieldError>({})
   const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [existingThumb, setExistingThumb] = useState<string | null>(null)
@@ -173,6 +164,7 @@ export function FormWarehouseModal({
     })
     setAddressEdited(!!warehouse?.address)
     setErrors({})
+    setSubmitError('')
     setPreviewUrl(null)
     setExistingThumb(warehouse?.thumbnailUrl ?? null)
     setDragOver(false)
@@ -314,34 +306,48 @@ export function FormWarehouseModal({
   }
 
   const handleSubmit = async () => {
+    setSubmitError('')
     const nextErrors = validate()
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
+    const lat = marker
+      ? marker[0]
+      : warehouse?.latitude != null
+        ? Number(warehouse.latitude)
+        : null
+    const lng = marker
+      ? marker[1]
+      : warehouse?.longitude != null
+        ? Number(warehouse.longitude)
+        : null
+
+    // Backend menerima multipart; alamat dipetakan ke kolom `location`.
+    const data = new FormData()
+    data.append('name', form.name.trim())
+    data.append('address', form.address.trim())
+    data.append('capacity', String(Number(form.capacity)))
+    if (lat !== null) data.append('latitude', String(lat))
+    if (lng !== null) data.append('longitude', String(lng))
+    if (form.thumbnail) data.append('thumbnail', form.thumbnail)
+    // Laravel: spoof method PUT untuk multipart saat edit.
+    if (isEdit) data.append('_method', 'PUT')
+
     setSubmitting(true)
-    // Catatan: backend gudang belum ada. Untuk sekarang data dikembalikan ke
-    // pemanggil lewat onSave (mis. update list lokal). Saat endpoint siap,
-    // ganti blok ini dengan POST/PUT multipart bergaya FormFieldModal.
-    onSave?.({
-      id: warehouse?.id,
-      name: form.name.trim(),
-      address: form.address.trim(),
-      capacity: Number(form.capacity),
-      latitude: marker
-        ? marker[0]
-        : warehouse?.latitude != null
-          ? Number(warehouse.latitude)
-          : null,
-      longitude: marker
-        ? marker[1]
-        : warehouse?.longitude != null
-          ? Number(warehouse.longitude)
-          : null,
-      thumbnail: form.thumbnail,
-      thumbnailUrl: previewUrl ?? existingThumb,
-    })
-    setSubmitting(false)
-    onClose()
+    try {
+      const url = isEdit ? `/warehouses/${warehouse.id}` : '/warehouses'
+      await api.post(url, data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      toast.success(isEdit ? 'Gudang diperbarui.' : 'Gudang ditambahkan.')
+      onSaved?.()
+      onClose()
+    } catch (error) {
+      console.error('Gagal menyimpan gudang:', error)
+      setSubmitError('Terjadi kesalahan saat menyimpan gudang. Coba lagi.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (!open) return null
@@ -603,6 +609,13 @@ export function FormWarehouseModal({
             </div>
           </div>
         </div>
+
+        {submitError && (
+          <div className="mx-6 mb-2 flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-500/25 dark:bg-red-500/15 dark:text-red-300">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{submitError}</span>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="flex shrink-0 gap-3 border-t border-gray-100 px-6 py-4 dark:border-white/10">

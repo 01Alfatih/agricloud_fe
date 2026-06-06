@@ -25,4 +25,26 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// Token Sanctum kini ber-TTL (vault Tickets/Auth-TokenTTL). Saat kedaluwarsa,
+// endpoint Bearer balas 401 → bersihkan token basi & lempar user ke login.
+// Endpoint /auth/* dikecualikan: 401-nya berarti kredensial/ID-token salah
+// (mis. Google login), bukan sesi yang habis.
+api.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    const status = error?.response?.status
+    const url: string = error?.config?.url ?? ''
+    const hadToken =
+      localStorage.getItem(TOKEN_KEY) ?? sessionStorage.getItem(TOKEN_KEY)
+    if (status === 401 && hadToken && !url.includes('/auth/')) {
+      localStorage.removeItem(TOKEN_KEY)
+      sessionStorage.removeItem(TOKEN_KEY)
+      if (window.location.pathname !== '/login-ii') {
+        window.location.href = '/login-ii'
+      }
+    }
+    return Promise.reject(error)
+  },
+)
+
 export default api

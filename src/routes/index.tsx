@@ -11,7 +11,7 @@ function App() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    navigate({ to: isAuthed() ? '/dashboard' : '/login-ii' })
+    navigate({ to: isAuthed() ? '/dashboard-ii' : '/login-ii' })
   }, [navigate])
 
   return <div></div>

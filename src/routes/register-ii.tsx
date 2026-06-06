@@ -38,7 +38,7 @@ function RouteComponent() {
   const [serverError, setServerError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (isAuthed()) navigate({ to: '/dashboard' })
+    if (isAuthed()) navigate({ to: '/dashboard-ii' })
   }, [navigate])
 
   const {
@@ -73,7 +73,7 @@ function RouteComponent() {
   }
 
   if (showSplash) {
-    return <SplashLiquid onDone={() => navigate({ to: '/dashboard' })} />
+    return <SplashLiquid onDone={() => navigate({ to: '/dashboard-ii' })} />
   }
 
   return (

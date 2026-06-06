@@ -185,7 +185,9 @@ function RouteComponent() {
                 disabled={submitting}
                 className="w-full bg-[#2D6A4F] hover:bg-[#1B4332]"
               >
-                {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {submitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 SIMPAN PASSWORD BARU
               </Button>
             </form>

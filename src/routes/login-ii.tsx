@@ -39,7 +39,7 @@ function RouteComponent() {
 
   // Sudah login → langsung ke dashboard (tanpa splash).
   useEffect(() => {
-    if (isAuthed()) navigate({ to: '/dashboard' })
+    if (isAuthed()) navigate({ to: '/dashboard-ii' })
   }, [navigate])
 
   const {
@@ -52,9 +52,13 @@ function RouteComponent() {
     setServerError(null)
     setSubmitting(true)
     try {
+      // `remember` dikirim ke backend agar TTL token menyesuaikan:
+      // true → TTL panjang (30 hari), false → TTL default (1 hari).
+      // (selaras pilihan storage di saveToken — lihat vault Tickets/Auth-TokenTTL.)
       const res = await api.post('/auth/login', {
         email: data.email,
         password: data.password,
+        remember,
       })
       const token = extractToken(res.data)
       if (!token) throw new Error('token kosong')
@@ -72,7 +76,7 @@ function RouteComponent() {
   }
 
   if (showSplash) {
-    return <SplashLiquid onDone={() => navigate({ to: '/dashboard' })} />
+    return <SplashLiquid onDone={() => navigate({ to: '/dashboard-ii' })} />
   }
 
   return (

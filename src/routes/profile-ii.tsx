@@ -18,9 +18,8 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { usePreferences } from '@/lib/preferences'
 
-export const Route = createFileRoute('/profile')({
+export const Route = createFileRoute('/profile-ii')({
   component: RouteComponent,
 })
 
@@ -54,8 +53,10 @@ function RouteComponent() {
   const [profile, setProfile] = useState<IProfile | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
 
-  // Preferensi global (tema/bahasa/notifikasi) — apply live + persist ke backend.
-  const { preferences, setPreference, save, saving } = usePreferences()
+  // State pengaturan — lokal dulu, belum di-persist ke backend
+  const [darkMode, setDarkMode] = useState(false)
+  const [notifications, setNotifications] = useState(true)
+  const [englishLang, setEnglishLang] = useState(false)
 
   useEffect(() => {
     axios
@@ -88,8 +89,8 @@ function RouteComponent() {
   }, [])
 
   const handleSave = () => {
-    // Perubahan toggle sudah apply live; ini mem-persist ke backend.
-    void save()
+    // TODO: kirim pengaturan ke backend kalau endpoint-nya sudah ada
+    console.log('Simpan pengaturan:', { darkMode, notifications, englishLang })
   }
 
   if (loading)
@@ -106,7 +107,7 @@ function RouteComponent() {
     )
 
   return (
-    <div className="min-h-screen bg-green-50 py-8 transition-colors sm:py-12 dark:bg-[#0c1410]">
+    <div className="min-h-screen bg-green-50 py-8 sm:py-12">
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-3 sm:px-4">
         {/* ============ KARTU PROFIL ============ */}
         <Card className="overflow-hidden rounded-3xl border-none p-0 shadow-xl">
@@ -135,11 +136,11 @@ function RouteComponent() {
               </div>
 
               <div className="flex flex-col">
-                <h2 className="text-3xl font-extrabold leading-tight text-gray-900 sm:text-4xl dark:text-gray-50">
+                <h2 className="text-3xl font-extrabold leading-tight text-gray-900 sm:text-4xl">
                   {profile.name}
                 </h2>
                 <Badge
-                  className="mt-2 w-fit bg-green-100 px-3 py-1 capitalize text-green-600 dark:bg-green-500/15 dark:text-green-300"
+                  className="mt-2 w-fit bg-green-100 px-3 py-1 capitalize text-green-600"
                   variant="secondary"
                 >
                   {profile.role}
@@ -168,7 +169,7 @@ function RouteComponent() {
               </div>
 
               <div>
-                <h3 className="mb-3 text-center font-semibold text-gray-800 dark:text-[#a7d1a7]">
+                <h3 className="mb-3 text-center font-semibold text-gray-800">
                   Data kepemilikan
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
@@ -185,40 +186,36 @@ function RouteComponent() {
         <Card className="rounded-3xl border-none shadow-xl">
           <CardContent className="flex min-h-[320px] flex-col p-6 sm:p-8">
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-[#a7d1a7]">
+              <h3 className="text-lg font-semibold text-gray-800">
                 Pengaturan
               </h3>
               <p className="mb-4 text-sm text-gray-400">
                 Atur preferensi tampilan dan akun kamu.
               </p>
 
-              <div className="flex flex-col divide-y divide-gray-100 dark:divide-white/10">
+              <div className="flex flex-col divide-y divide-gray-100">
                 <SettingToggle
                   icon={<Moon className="size-5 text-green-700" />}
                   title="Mode Gelap"
                   desc="Ubah tema antarmuka jadi gelap"
-                  checked={preferences.theme === 'dark'}
-                  onCheckedChange={(v) =>
-                    setPreference('theme', v ? 'dark' : 'light')
-                  }
+                  checked={darkMode}
+                  onCheckedChange={setDarkMode}
                   id="setting-dark"
                 />
                 <SettingToggle
                   icon={<Bell className="size-5 text-green-700" />}
                   title="Notifikasi"
                   desc="Terima pemberitahuan aktivitas lahan"
-                  checked={preferences.notifications}
-                  onCheckedChange={(v) => setPreference('notifications', v)}
+                  checked={notifications}
+                  onCheckedChange={setNotifications}
                   id="setting-notif"
                 />
                 <SettingToggle
                   icon={<Globe className="size-5 text-green-700" />}
                   title="Bahasa Inggris"
                   desc="Tampilkan antarmuka dalam Bahasa Inggris"
-                  checked={preferences.language === 'en'}
-                  onCheckedChange={(v) =>
-                    setPreference('language', v ? 'en' : 'id')
-                  }
+                  checked={englishLang}
+                  onCheckedChange={setEnglishLang}
                   id="setting-lang"
                 />
                 <SettingLink
@@ -245,9 +242,8 @@ function RouteComponent() {
               <Button
                 className="min-w-32 bg-green-700 text-white hover:bg-green-800"
                 onClick={handleSave}
-                disabled={saving}
               >
-                {saving ? 'Menyimpan...' : 'Simpan'}
+                Simpan
               </Button>
             </div>
           </CardContent>
@@ -268,10 +264,8 @@ function FieldPill({
 }) {
   return (
     <div>
-      <p className="mb-1 text-sm font-semibold text-gray-700 dark:text-[#a7d1a7]">
-        {label}
-      </p>
-      <div className="flex items-center gap-2 rounded-xl bg-green-700 px-4 py-3 text-white dark:border dark:border-green-600/30 dark:bg-green-800/50">
+      <p className="mb-1 text-sm font-semibold text-gray-700">{label}</p>
+      <div className="flex items-center gap-2 rounded-xl bg-green-700 px-4 py-3 text-white">
         <span className="shrink-0 opacity-80">{icon}</span>
         <span className="min-w-0 truncate text-sm">{value}</span>
       </div>
@@ -281,7 +275,7 @@ function FieldPill({
 
 function OwnStat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex flex-col items-center rounded-xl bg-green-600 px-2 py-4 text-white dark:border dark:border-green-500/30 dark:bg-green-700/50">
+    <div className="flex flex-col items-center rounded-xl bg-green-600 px-2 py-4 text-white">
       <span className="text-xs opacity-90">{label}</span>
       <span className="text-2xl font-bold leading-tight">{value}</span>
     </div>
@@ -306,13 +300,13 @@ function SettingToggle({
   return (
     <div className="flex items-center justify-between gap-3 py-4">
       <div className="flex min-w-0 items-center gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-500/15">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-green-100">
           {icon}
         </span>
         <div className="min-w-0">
           <Label
             htmlFor={id}
-            className="cursor-pointer text-sm font-medium text-gray-800 dark:text-gray-100"
+            className="cursor-pointer text-sm font-medium text-gray-800"
           >
             {title}
           </Label>
@@ -339,16 +333,14 @@ function SettingLink({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center justify-between gap-3 py-4 text-left transition-colors hover:bg-gray-50 dark:hover:bg-white/5"
+      className="flex items-center justify-between gap-3 py-4 text-left transition-colors hover:bg-gray-50"
     >
       <div className="flex min-w-0 items-center gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-500/15">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-green-100">
           {icon}
         </span>
         <div className="min-w-0">
-          <p className="text-sm font-medium text-gray-800 dark:text-gray-100">
-            {title}
-          </p>
+          <p className="text-sm font-medium text-gray-800">{title}</p>
           <p className="truncate text-xs text-gray-400">{desc}</p>
         </div>
       </div>

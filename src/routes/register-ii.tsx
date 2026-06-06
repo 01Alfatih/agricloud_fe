@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { toast } from 'sonner'
 
 import api from '@/lib/api'
 import { extractToken, isAuthed, saveToken } from '@/lib/auth'
@@ -61,12 +62,14 @@ function RouteComponent() {
       const token = extractToken(res.data)
       if (!token) throw new Error('token kosong')
       saveToken(token)
+      toast.success('Akun berhasil dibuat!')
       setShowSplash(true)
     } catch (err: any) {
-      setServerError(
+      const message =
         err?.response?.data?.message ??
-          'Registrasi gagal. Periksa data atau coba lagi nanti.',
-      )
+        'Registrasi gagal. Periksa data atau coba lagi nanti.'
+      setServerError(message)
+      toast.error(message)
     } finally {
       setSubmitting(false)
     }

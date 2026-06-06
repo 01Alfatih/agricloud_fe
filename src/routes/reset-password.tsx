@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { toast } from 'sonner'
 
 import api from '@/lib/api'
 import { Button } from '@/components/ui/button'
@@ -61,11 +62,13 @@ function RouteComponent() {
         password_confirmation: data.confirm,
       })
       setDone(true)
+      toast.success('Password berhasil diubah')
     } catch (err: any) {
-      setServerError(
+      const message =
         err?.response?.data?.message ??
-          'Link reset tidak valid atau sudah kadaluarsa.',
-      )
+        'Link reset tidak valid atau sudah kadaluarsa.'
+      setServerError(message)
+      toast.error(message)
     } finally {
       setSubmitting(false)
     }

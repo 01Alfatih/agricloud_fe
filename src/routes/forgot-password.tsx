@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { toast } from 'sonner'
 
 import api from '@/lib/api'
 import { Button } from '@/components/ui/button'
@@ -43,11 +44,13 @@ function RouteComponent() {
       await api.post('/auth/forgot-password', { email: data.email })
       // Selalu tampilkan sukses (anti email-enumeration), selama request tak error server.
       setSent(true)
+      toast.success('Email reset terkirim, cek inbox kamu')
     } catch (err: any) {
-      setServerError(
+      const message =
         err?.response?.data?.message ??
-          'Tidak bisa mengirim email reset. Coba lagi nanti.',
-      )
+        'Tidak bisa mengirim email reset. Coba lagi nanti.'
+      setServerError(message)
+      toast.error(message)
     } finally {
       setSubmitting(false)
     }

@@ -1,7 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import {
   AlertTriangle,
-  Bell,
   CalendarDays,
   CheckCircle2,
   Cloud,
@@ -497,14 +496,6 @@ function RouteComponent() {
             className="order-2 shrink-0 text-[#1a472a] hover:bg-[#a7d1a7]/40 md:order-3 dark:text-[#a7d1a7] dark:hover:bg-white/10"
           >
             {dark ? <Sun className="h-6 w-6" /> : <Moon className="h-6 w-6" />}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative order-2 shrink-0 text-[#1a472a] md:order-3 dark:text-[#a7d1a7]"
-          >
-            <Bell className="h-6 w-6" />
-            <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
           </Button>
         </div>
 

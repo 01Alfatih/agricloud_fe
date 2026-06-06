@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, DragEvent } from 'react'
 import axios from 'axios'
+import { toast } from 'sonner'
 import {
   AlertCircle,
   ArrowLeft,
@@ -234,12 +235,14 @@ function RouteComponent() {
           'Content-Type': 'multipart/form-data',
         },
       })
+      toast.success('Lahan berhasil dibuat')
       navigate({ to: '/field' })
     } catch (error) {
       console.error('Gagal mengirim data lahan:', error)
-      setSubmitError(
-        'Terjadi kesalahan saat menyimpan lahan. Coba lagi sebentar.',
-      )
+      const message =
+        'Terjadi kesalahan saat menyimpan lahan. Coba lagi sebentar.'
+      setSubmitError(message)
+      toast.error(message)
     } finally {
       setSubmitting(false)
     }

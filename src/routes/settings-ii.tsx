@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { toast } from 'sonner'
 import {
   Bell,
   Check,
@@ -126,9 +127,14 @@ function RouteComponent() {
 
   // Persist preferensi ke backend; tampilkan flash "Tersimpan" sebentar.
   const handleSave = async () => {
-    await save()
-    setSavedFlash(true)
-    setTimeout(() => setSavedFlash(false), 2000)
+    try {
+      await save()
+      setSavedFlash(true)
+      setTimeout(() => setSavedFlash(false), 2000)
+      toast.success('Pengaturan tersimpan')
+    } catch {
+      toast.error('Gagal menyimpan pengaturan. Coba lagi sebentar.')
+    }
   }
 
   const activeMeta = SECTIONS.find((s) => s.id === active)!

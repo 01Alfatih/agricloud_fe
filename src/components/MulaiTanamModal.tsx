@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { toast } from 'sonner'
 import {
   AlertCircle,
   CalendarDays,
@@ -143,6 +144,7 @@ export function MulaiTanamModal({
         },
         { headers: { Authorization: `Bearer ${token}` } },
       )
+      toast.success('Siklus tanam berhasil dimulai')
       onCreated?.()
       onClose()
     } catch (error) {
@@ -164,8 +166,10 @@ export function MulaiTanamModal({
         setSubmitError(
           error.response.data?.message ?? 'Periksa kembali isian formulir.',
         )
+        toast.error('Periksa kembali isian formulir.')
       } else {
         setSubmitError('Gagal memulai tanam. Coba lagi sebentar.')
+        toast.error('Gagal memulai tanam. Coba lagi sebentar.')
       }
     } finally {
       setSubmitting(false)

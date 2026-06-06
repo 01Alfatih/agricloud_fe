@@ -2,6 +2,7 @@ import { Outlet, createRootRoute, useRouterState } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
 import { SidebarDs } from '@/components/Sidebar'
+import { Toaster } from '@/components/ui/sonner'
 import { PreferencesProvider } from '@/lib/preferences'
 
 // Halaman tanpa navigasi: auth/redirect + form full-page (mis. peta lahan).
@@ -41,6 +42,7 @@ export const Route = createRootRoute({
           <Outlet />
         </main>
 
+        <Toaster />
         <TanStackRouterDevtools />
       </PreferencesProvider>
     )

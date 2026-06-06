@@ -12,6 +12,7 @@ import {
   X,
 } from 'lucide-react'
 import { Link, useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
@@ -183,6 +184,7 @@ export function SidebarDs() {
 
   const handleLogout = () => {
     localStorage.removeItem('token')
+    toast.success('Berhasil keluar')
     navigate({ to: '/login' })
   }
 

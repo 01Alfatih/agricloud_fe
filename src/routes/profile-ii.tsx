@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { toast } from 'sonner'
 import {
   Bell,
   ChevronRight,
@@ -91,6 +92,7 @@ function RouteComponent() {
   const handleSave = () => {
     // TODO: kirim pengaturan ke backend kalau endpoint-nya sudah ada
     console.log('Simpan pengaturan:', { darkMode, notifications, englishLang })
+    toast.success('Pengaturan tersimpan')
   }
 
   if (loading)

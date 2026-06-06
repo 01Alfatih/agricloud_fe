@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { toast } from 'sonner'
 
 import api from '@/lib/api'
 import { extractToken, isAuthed, saveToken } from '@/lib/auth'
@@ -63,13 +64,15 @@ function RouteComponent() {
       const token = extractToken(res.data)
       if (!token) throw new Error('token kosong')
       saveToken(token, remember)
+      toast.success('Selamat datang kembali!')
       setShowSplash(true)
     } catch (err: any) {
-      setServerError(
+      const message =
         err?.response?.status === 422
           ? 'Email atau password salah, silakan coba lagi.'
-          : 'Tidak bisa terhubung ke server. Coba lagi nanti.',
-      )
+          : 'Tidak bisa terhubung ke server. Coba lagi nanti.'
+      setServerError(message)
+      toast.error(message)
     } finally {
       setSubmitting(false)
     }

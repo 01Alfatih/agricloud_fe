@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Plus, Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
+import { Plus, Search } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent } from '@/components/ui/card'
 
 export const Route = createFileRoute('/warehouse')({
   component: RouteComponent,
@@ -12,27 +12,27 @@ function RouteComponent() {
   const warehouses = [
     {
       id: 1,
-      name: "Gudang 1",
-      address: "Alamat Gudang : Brebes Jl. Netral",
-      itemCount: "Jumlah Barang : 500",
-      owner: "Nama Pemilik : Yoyo",
-      image: "https://placehold.co/600x400",
+      name: 'Gudang 1',
+      address: 'Alamat Gudang : Brebes Jl. Netral',
+      itemCount: 'Jumlah Barang : 500',
+      owner: 'Nama Pemilik : Yoyo',
+      image: 'https://placehold.co/600x400',
     },
     {
       id: 2,
-      name: "Gudang 2",
-      address: "Alamat Gudang : Brebes Jl. Netral",
-      itemCount: "Jumlah Barang : 500",
-      owner: "Nama Pemilik : Yoyo",
-      image: "https://placehold.co/600x400",
+      name: 'Gudang 2',
+      address: 'Alamat Gudang : Brebes Jl. Netral',
+      itemCount: 'Jumlah Barang : 500',
+      owner: 'Nama Pemilik : Yoyo',
+      image: 'https://placehold.co/600x400',
     },
     {
       id: 3,
-      name: "Gudang 3",
-      address: "Alamat Gudang : Brebes Jl. Netral",
-      itemCount: "Jumlah Barang : 500",
-      owner: "Nama Pemilik : Yoyo",
-      image: "https://placehold.co/600x400",
+      name: 'Gudang 3',
+      address: 'Alamat Gudang : Brebes Jl. Netral',
+      itemCount: 'Jumlah Barang : 500',
+      owner: 'Nama Pemilik : Yoyo',
+      image: 'https://placehold.co/600x400',
     },
   ]
 
@@ -43,12 +43,12 @@ function RouteComponent() {
         <div
           className="relative h-32 bg-cover bg-center"
           style={{
-            backgroundImage: "url(/images/warehouse-header.png)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
+            backgroundImage: 'url(/images/warehouse-header.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
           }}
         >
-          <div className="absolute inset-0 bg-green-200 bg-opacity-20" >
+          <div className="absolute inset-0 bg-green-200 bg-opacity-20">
             <div className="relative flex items-center justify-center h-full px-4">
               <div className="relative w-full max-w-md">
                 <Input
@@ -70,14 +70,15 @@ function RouteComponent() {
         {/* Warehouse Grid */}
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-
-
             {warehouses.map((warehouse) => (
-              <Card key={warehouse.id} className="bg-white shadow-md hover:shadow-lg transition-shadow">
+              <Card
+                key={warehouse.id}
+                className="bg-white shadow-md hover:shadow-lg transition-shadow"
+              >
                 <CardContent className="p-0">
                   <div className="relative">
                     <img
-                      src={warehouse.image || "/placeholder.svg"}
+                      src={warehouse.image || '/placeholder.svg'}
                       alt={`${warehouse.name} warehouse interior`}
                       className="w-full h-48 object-cover rounded-t-lg"
                     />
@@ -88,13 +89,18 @@ function RouteComponent() {
                     </div>
                   </div>
                   <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3">{warehouse.name}</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                      {warehouse.name}
+                    </h3>
                     <div className="space-y-1 text-sm text-gray-600 mb-4">
                       <p>{warehouse.address}</p>
                       <p>{warehouse.itemCount}</p>
                       <p>{warehouse.owner}</p>
                     </div>
-                    <Button variant="outline" className="w-full border-teal-600 text-teal-600 hover:bg-teal-50">
+                    <Button
+                      variant="outline"
+                      className="w-full border-teal-600 text-teal-600 hover:bg-teal-50"
+                    >
                       See Details
                     </Button>
                   </div>
@@ -109,7 +115,9 @@ function RouteComponent() {
                   <div className="w-16 h-16 bg-gray-400 rounded-full flex items-center justify-center mb-4">
                     <Plus className="h-8 w-8 text-white" />
                   </div>
-                  <p className="text-gray-600 font-medium">Tambah Gudang Baru</p>
+                  <p className="text-gray-600 font-medium">
+                    Tambah Gudang Baru
+                  </p>
                 </div>
               </CardContent>
             </Card>

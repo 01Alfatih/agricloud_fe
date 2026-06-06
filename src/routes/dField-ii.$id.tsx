@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   ArrowRight,
   CalendarDays,
+  CloudSun,
   MapPin,
   Pencil,
   Ruler,
@@ -24,7 +25,7 @@ import { reverseGeocode } from '@/utils/reversGeocode'
 import { FormFieldModal } from '@/components/FormFieldModal'
 import type { FieldInitialData } from '@/components/FormFieldModal'
 import { MulaiTanamModal } from '@/components/MulaiTanamModal'
-import { WeatherCard } from '@/components/WeatherCard'
+import { WeatherContent } from '@/components/WeatherCard'
 import { ActiveCycleCard } from '@/components/ActiveCycleCard'
 
 export const Route = createFileRoute('/dField-ii/$id')({
@@ -42,6 +43,7 @@ interface Ifield {
   area: string
   owner: { id: number; name: string }
   crops?: Array<FieldCrop>
+  boundary?: Array<[number, number]> | null
   created_at: string
   updated_at: string
   address?: string
@@ -56,6 +58,7 @@ interface IfieldResponse {
   area: string
   owner: { id: number; name: string }
   crops?: Array<FieldCrop>
+  boundary?: Array<[number, number]> | null
   created_at: string
   updated_at: string
 }
@@ -339,6 +342,19 @@ function RouteComponent() {
                 iconClass="bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300"
               />
             </div>
+
+            {/* Cuaca (real, per-koordinat lahan) — disatukan di sini dalam versi
+                ringkas, bukan kartu terpisah yang besar. */}
+            <div className="border-t border-gray-100 pt-5 dark:border-white/10">
+              <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-[#1a472a] dark:text-[#a7d1a7]">
+                <CloudSun className="h-4 w-4" /> Cuaca Lahan
+              </h3>
+              <WeatherContent
+                lat={hasCoords ? lat : null}
+                lng={hasCoords ? lng : null}
+                compact
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -350,31 +366,28 @@ function RouteComponent() {
           refreshKey={cycleRefresh}
         />
 
-        {/* Cuaca (real, per-koordinat lahan) + Peta */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <WeatherCard
-            lat={hasCoords ? lat : null}
-            lng={hasCoords ? lng : null}
-          />
-
-          {/* Peta */}
-          <Card className="overflow-hidden rounded-xl bg-white shadow-sm dark:bg-[#15211a] dark:border-white/10">
-            <CardContent className="space-y-4 p-5 sm:p-6">
-              <h3 className="flex items-center gap-2 text-base font-semibold text-[#1a472a] dark:text-[#a7d1a7]">
-                <MapPin className="h-4 w-4" /> Lokasi Lahan
-              </h3>
-              <div className="h-[360px] w-full overflow-hidden rounded-lg">
-                {hasCoords ? (
-                  <MapClient center={[lat, lng]} zoom={17} radius={50} />
-                ) : (
-                  <div className="flex h-full items-center justify-center bg-gray-100 text-sm text-gray-500 dark:bg-white/5 dark:text-gray-400">
-                    Koordinat lahan tidak tersedia
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Peta — bentuk lahan asli (poligon batas), bukan lingkaran. */}
+        <Card className="overflow-hidden rounded-xl bg-white shadow-sm dark:bg-[#15211a] dark:border-white/10">
+          <CardContent className="space-y-4 p-5 sm:p-6">
+            <h3 className="flex items-center gap-2 text-base font-semibold text-[#1a472a] dark:text-[#a7d1a7]">
+              <MapPin className="h-4 w-4" /> Lokasi Lahan
+            </h3>
+            <div className="h-[360px] w-full overflow-hidden rounded-lg">
+              {hasCoords ? (
+                <MapClient
+                  center={[lat, lng]}
+                  zoom={17}
+                  radius={50}
+                  boundary={field.boundary}
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center bg-gray-100 text-sm text-gray-500 dark:bg-white/5 dark:text-gray-400">
+                  Koordinat lahan tidak tersedia
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Modal edit lahan */}

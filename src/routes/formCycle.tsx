@@ -1,36 +1,34 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/formCycle')({
   component: RouteComponent,
 })
 
 interface iTemplate {
-  id: number;
-  name: string;
-  description: string;
+  id: number
+  name: string
+  description: string
 }
 
-
 function RouteComponent() {
- const [templates, setTemplates] = useState<iTemplate[]>([]);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<number | "">("");
+  const [templates, setTemplates] = useState<iTemplate[]>([])
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | ''>('')
 
   useEffect(() => {
     // Simulasi fetch dari API
     const fetchTemplates = async () => {
-      const response = await fetch('http://localhost:8000/api/crop-templates'); 
-      const json = await response.json();
-      setTemplates(json.data);
-    };
+      const response = await fetch('http://localhost:8005/api/crop-templates')
+      const json = await response.json()
+      setTemplates(json.data)
+    }
 
-    fetchTemplates();
-  }, []);
+    fetchTemplates()
+  }, [])
 
   return (
     <div
@@ -41,20 +39,22 @@ function RouteComponent() {
     >
       {/* Logo */}
       <div className="flex items-center gap-2 mb-8">
-        <img src="/logo1.png" alt="" className='w-xs' />
+        <img src="/logo1.png" alt="" className="w-xs" />
       </div>
 
       {/* Form Card */}
       <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm">
         <CardHeader className="pb-4">
-          <h2 className="text-center text-gray-700 font-medium">Mulai Tanam Baru</h2>
+          <h2 className="text-center text-gray-700 font-medium">
+            Mulai Tanam Baru
+          </h2>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="nama-tanaman" className="text-gray-600 text-sm">
               Pilih Template
             </Label>
-           <select
+            <select
               id="template-id"
               value={selectedTemplateId}
               onChange={(e) => setSelectedTemplateId(Number(e.target.value))}
@@ -100,7 +100,9 @@ function RouteComponent() {
             />
           </div>
 
-          <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 mt-8">Mulai</Button>
+          <Button className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 mt-8">
+            Mulai
+          </Button>
         </CardContent>
       </Card>
     </div>

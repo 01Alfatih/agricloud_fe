@@ -25,18 +25,28 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Token Sanctum kini ber-TTL (vault Tickets/Auth-TokenTTL). Saat kedaluwarsa,
-// endpoint Bearer balas 401 → bersihkan token basi & lempar user ke login.
-// Endpoint /auth/* dikecualikan: 401-nya berarti kredensial/ID-token salah
-// (mis. Google login), bukan sesi yang habis.
+// Endpoint kredensial: 401-nya berarti kredensial/ID-token salah (bukan sesi
+// habis), jadi JANGAN bersihkan token / redirect. `/auth/user` SENGAJA tidak
+// di sini — itu cek sesi, 401-nya = token kedaluwarsa/invalid → harus logout.
+const CREDENTIAL_ENDPOINTS = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/google',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+]
+
+// Token kini ber-TTL (vault Tickets/Auth-TokenTTL). Saat kedaluwarsa, endpoint
+// Bearer balas 401 → bersihkan token basi & lempar user ke login.
 api.interceptors.response.use(
   (res) => res,
   (error) => {
     const status = error?.response?.status
     const url: string = error?.config?.url ?? ''
+    const isCredentialCall = CREDENTIAL_ENDPOINTS.some((p) => url.includes(p))
     const hadToken =
       localStorage.getItem(TOKEN_KEY) ?? sessionStorage.getItem(TOKEN_KEY)
-    if (status === 401 && hadToken && !url.includes('/auth/')) {
+    if (status === 401 && hadToken && !isCredentialCall) {
       localStorage.removeItem(TOKEN_KEY)
       sessionStorage.removeItem(TOKEN_KEY)
       if (window.location.pathname !== '/login-ii') {

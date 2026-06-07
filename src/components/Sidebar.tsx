@@ -13,15 +13,14 @@ import {
 } from 'lucide-react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import axios from 'axios'
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { NotificationBell } from '@/components/NotificationBell'
 import { useDarkMode } from '@/hooks/useDarkMode'
 import { cn } from '@/lib/utils'
-
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
+import { api } from '@/lib/api'
+import { clearToken, getToken } from '@/lib/auth'
 
 type NavLink = {
   icon: ReactNode
@@ -134,22 +133,18 @@ export function SidebarDs() {
   const [open, setOpen] = useState<boolean>(false)
   const closeSidebar = () => setOpen(false)
 
-  // Redirect ke login kalau token tidak ada.
+  // Redirect ke login kalau token tidak ada (cek localStorage & sessionStorage).
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      navigate({ to: '/login' })
+    if (!getToken()) {
+      navigate({ to: '/login-ii' })
     }
   }, [navigate])
 
-  // Ambil data profil (dinamis dari API).
+  // Ambil data profil (dinamis dari API). Pakai instance `api` terpusat agar
+  // token Bearer ikut aturan storage "Ingat Saya" (local/session) yang sama.
   useEffect(() => {
-    axios
-      .get<{ data: IProfileResponse }>(`${API_BASE_URL}/auth/user`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
+    api
+      .get<{ data: IProfileResponse }>('/auth/user')
       .then((response) => {
         const data = response.data.data
         setProfile({
@@ -183,9 +178,9 @@ export function SidebarDs() {
   }, [open])
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
+    clearToken()
     toast.success('Berhasil keluar')
-    navigate({ to: '/login' })
+    navigate({ to: '/login-ii' })
   }
 
   return (

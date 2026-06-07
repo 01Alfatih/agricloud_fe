@@ -63,6 +63,28 @@ const toneStyles: Record<Tone, string> = {
   info: 'bg-sky-100 text-sky-700 border-sky-200 dark:bg-sky-500/15 dark:text-sky-300 dark:border-sky-500/25',
 }
 
+// Peta untuk tugas "Perlu Tindakan" (kontrak §7): ikon dari jenis tugas,
+// warna & label badge dari tingkat urgensi.
+const TASK_ICON: Record<TaskType, ComponentType<{ className?: string }>> = {
+  harvest: Scissors,
+  input: Sprout,
+  restock: Warehouse,
+}
+
+const URGENCY_TONE: Record<TaskUrgency, Tone> = {
+  due: 'danger',
+  urgent: 'danger',
+  today: 'warning',
+  upcoming: 'info',
+}
+
+const URGENCY_LABEL: Record<TaskUrgency, string> = {
+  due: 'Terlewat',
+  urgent: 'Mendesak',
+  today: 'Hari ini',
+  upcoming: 'Akan datang',
+}
+
 const dotStyles: Record<Tone, string> = {
   success: 'bg-green-500',
   warning: 'bg-amber-500',
@@ -103,6 +125,20 @@ interface ICycleResponse {
   estimated_harvest_date?: string
 }
 
+// Tugas "Perlu Tindakan" — computed di backend (kontrak §7 GET /api/tasks).
+type TaskType = 'harvest' | 'input' | 'restock'
+type TaskUrgency = 'due' | 'today' | 'urgent' | 'upcoming'
+
+interface ITaskResponse {
+  id: string
+  title: string
+  field_id?: number | null
+  field_name?: string | null
+  type: TaskType
+  due_date?: string | null
+  urgency: TaskUrgency
+}
+
 /* ------------------------------- data hook -------------------------------- */
 
 // Siklus yang sudah ditandai lahannya (untuk Fase Tanam & hitung tanaman aktif).
@@ -117,6 +153,7 @@ interface IDashboardData {
   fields: Array<IFieldResponse>
   warehouses: Array<IWarehouse>
   cycles: Array<ICycle>
+  tasks: Array<ITaskResponse>
 }
 
 // Tarik semua sumber data dashboard sekali jalan: profil, lahan, gudang, siklus.
@@ -128,6 +165,7 @@ function useDashboardData(): IDashboardData {
   const [fields, setFields] = useState<Array<IFieldResponse>>([])
   const [warehouses, setWarehouses] = useState<Array<IWarehouse>>([])
   const [cycles, setCycles] = useState<Array<ICycle>>([])
+  const [tasks, setTasks] = useState<Array<ITaskResponse>>([])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -138,11 +176,12 @@ function useDashboardData(): IDashboardData {
       setLoading(true)
       const opts = { signal: controller.signal }
 
-      // Profil, lahan, gudang paralel — masing-masing tahan gagal sendiri.
-      const [fieldsRes, whRes, userRes] = await Promise.allSettled([
+      // Profil, lahan, gudang, tugas paralel — masing-masing tahan gagal sendiri.
+      const [fieldsRes, whRes, userRes, tasksRes] = await Promise.allSettled([
         api.get<{ data?: Array<IFieldResponse> }>('/myfields', opts),
         api.get<{ data?: Array<IWarehouseResponse> }>('/warehouses', opts),
         api.get<{ data?: { name?: string } }>('/auth/user', opts),
+        api.get<{ data?: Array<ITaskResponse> }>('/tasks', opts),
       ])
 
       if (isAborted()) return
@@ -160,6 +199,9 @@ function useDashboardData(): IDashboardData {
       if (userRes.status === 'fulfilled') {
         setUserName(userRes.value.data.data?.name ?? '')
       }
+      setTasks(
+        tasksRes.status === 'fulfilled' ? (tasksRes.value.data.data ?? []) : [],
+      )
 
       // Siklus per lahan → diratakan jadi satu daftar.
       const nameById = new Map(fieldList.map((f) => [f.id, f.name]))
@@ -196,7 +238,7 @@ function useDashboardData(): IDashboardData {
     return () => controller.abort()
   }, [])
 
-  return { loading, userName, fields, warehouses, cycles }
+  return { loading, userName, fields, warehouses, cycles, tasks }
 }
 
 /* -------------------------------- helpers --------------------------------- */
@@ -354,7 +396,8 @@ function DashboardWeather() {
 
 function RouteComponent() {
   const [dark, toggleDark] = useDarkMode()
-  const { loading, userName, fields, warehouses, cycles } = useDashboardData()
+  const { loading, userName, fields, warehouses, cycles, tasks } =
+    useDashboardData()
   const [query, setQuery] = useState('')
 
   /* --- Fase Tanam: kelompokkan siklus per lahan (dukung tumpang sari) --- */
@@ -407,62 +450,24 @@ function RouteComponent() {
   }
 
   /* --- Tindakan: diturunkan dari sinyal nyata (gudang/lahan/siklus) --- */
+  // "Perlu Tindakan" kini dari kontrak §7 (GET /api/tasks, computed backend):
+  // bentuk task dipetakan ke UI — ikon dari jenis, warna & badge dari urgensi.
   const alerts = useMemo(() => {
-    const out: Array<{
-      id: string
-      title: string
-      sub: string
-      icon: ComponentType<{ className?: string }>
-      tone: Tone
-      badge: string
-    }> = []
-
-    // Gudang hampir penuh → perlu distribusi.
-    for (const w of warehouses) {
-      const usage = usagePercent(w.items, w.capacity)
-      if (usage >= 80) {
-        out.push({
-          id: `w-${w.id}`,
-          title: 'Distribusi hasil panen',
-          sub: `${w.name} • ${usage}% terisi`,
-          icon: Warehouse,
-          tone: 'danger',
-          badge: 'Gudang penuh',
-        })
+    // Urutan urgensi sudah dari backend (due → urgent → today → upcoming).
+    return tasks.map((t) => {
+      const sub = [t.field_name, formatShortDate(t.due_date ?? undefined)]
+        .filter((s) => s && s !== '—')
+        .join(' • ')
+      return {
+        id: t.id,
+        title: t.title,
+        sub: sub || 'Tanpa tenggat',
+        icon: TASK_ICON[t.type] ?? AlertTriangle,
+        tone: URGENCY_TONE[t.urgency] ?? 'info',
+        badge: URGENCY_LABEL[t.urgency] ?? t.urgency,
       }
-    }
-
-    // Siklus aktif yang hampir matang → siap panen.
-    for (const f of fields) {
-      const c = f.active_cycle
-      if (c?.plant_name && typeof c.progress === 'number' && c.progress >= 90) {
-        out.push({
-          id: `h-${f.id}`,
-          title: 'Perkiraan panen',
-          sub: `${f.name} • ${c.plant_name}`,
-          icon: Scissors,
-          tone: 'success',
-          badge: 'Siap panen',
-        })
-      }
-    }
-
-    // Lahan tanpa siklus aktif → ajakan mulai tanam.
-    for (const f of fields) {
-      if (!f.active_cycle?.plant_name) {
-        out.push({
-          id: `e-${f.id}`,
-          title: 'Lahan belum ditanami',
-          sub: f.name,
-          icon: Sprout,
-          tone: 'info',
-          badge: 'Lahan kosong',
-        })
-      }
-    }
-
-    return out
-  }, [warehouses, fields])
+    })
+  }, [tasks])
 
   /* --- KPI dari data nyata --- */
   const totalAreaM2 = fields.reduce((sum, f) => sum + (Number(f.area) || 0), 0)

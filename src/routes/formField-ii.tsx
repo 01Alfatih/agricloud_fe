@@ -26,6 +26,8 @@ import FieldMapPicker, {
 } from '@/components/FieldMapPicker'
 import type { LatLng } from '@/components/FieldMapPicker'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
+
 export const Route = createFileRoute('/formField-ii')({
   component: RouteComponent,
 })
@@ -229,7 +231,7 @@ function RouteComponent() {
 
     setSubmitting(true)
     try {
-      await axios.post('http://localhost:8005/api/myfields', data, {
+      await axios.post(`${API_BASE_URL}/myfields`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',

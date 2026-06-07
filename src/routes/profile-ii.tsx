@@ -20,6 +20,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
+
 export const Route = createFileRoute('/profile-ii')({
   component: RouteComponent,
 })
@@ -61,7 +63,7 @@ function RouteComponent() {
 
   useEffect(() => {
     axios
-      .get<{ data: IProfileResponse }>('http://localhost:8005/api/auth/user', {
+      .get<{ data: IProfileResponse }>(`${API_BASE_URL}/auth/user`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },

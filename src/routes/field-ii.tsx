@@ -23,6 +23,8 @@ import type { FieldCrop } from '@/lib/crops'
 import { FormFieldModal } from '@/components/FormFieldModal'
 import type { FieldInitialData } from '@/components/FormFieldModal'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
+
 export const Route = createFileRoute('/field-ii')({
   component: RouteComponent,
 })
@@ -171,7 +173,7 @@ function RouteComponent() {
     setLoading(true)
     try {
       const response = await axios.get<{ data: Array<IfieldResponse> }>(
-        'http://localhost:8005/api/myfields',
+        `${API_BASE_URL}/myfields`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -237,7 +239,7 @@ function RouteComponent() {
     if (!ok) return
 
     try {
-      await axios.delete(`http://localhost:8005/api/myfields/${land.id}`, {
+      await axios.delete(`${API_BASE_URL}/myfields/${land.id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       })
       toast.success(`Lahan "${land.name}" dihapus.`)

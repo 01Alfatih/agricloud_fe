@@ -15,6 +15,8 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { reverseGeocode } from '@/utils/reversGeocode'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
+
 export const Route = createFileRoute('/field')({
   component: RouteComponent,
 })
@@ -99,7 +101,7 @@ function RouteComponent() {
     const fetchData = async () => {
       try {
         const response = await axios.get<{ data: Array<IfieldResponse> }>(
-          'http://localhost:8005/api/myfields',
+          `${API_BASE_URL}/myfields`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('token')}`,

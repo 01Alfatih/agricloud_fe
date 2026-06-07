@@ -23,7 +23,7 @@ import FieldMapPicker, {
 } from '@/components/FieldMapPicker'
 import type { LatLng } from '@/components/FieldMapPicker'
 
-const API_BASE_URL = 'http://localhost:8005/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
 const DEFAULT_CENTER: [number, number] = [-6.2, 106.81] // Jakarta
 
 // Data lahan untuk mode edit (opsional). Tanpa ini = mode tambah.

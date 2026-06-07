@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
+
 export const Route = createFileRoute('/formCycle')({
   component: RouteComponent,
 })
@@ -22,7 +24,7 @@ function RouteComponent() {
   useEffect(() => {
     // Simulasi fetch dari API
     const fetchTemplates = async () => {
-      const response = await fetch('http://localhost:8005/api/crop-templates')
+      const response = await fetch(`${API_BASE_URL}/crop-templates`)
       const json = await response.json()
       setTemplates(json.data)
     }

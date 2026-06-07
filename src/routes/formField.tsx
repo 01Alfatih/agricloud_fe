@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
+
 export const Route = createFileRoute('/formField')({
   component: RouteComponent,
 })
@@ -89,16 +91,12 @@ function RouteComponent() {
     if (formData.thumbnail) data.append('thumbnail', formData.thumbnail)
 
     try {
-      const response = await axios.post(
-        'http://localhost:8005/api/myfields',
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
+      const response = await axios.post(`${API_BASE_URL}/myfields`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
         },
-      )
+      })
       console.log('Lahan berhasil ditambahkan:', response.data)
       navigate({ to: '/field' })
     } catch (error) {

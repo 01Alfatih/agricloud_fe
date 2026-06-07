@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 
-const API_BASE_URL = 'http://localhost:8005/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
 
 // Detail satu siklus tanam. `field_id` wajib karena backend belum punya
 // `GET /api/cycles/{id}`; kita ambil `GET /api/cycles?field_id=` lalu cari by id.

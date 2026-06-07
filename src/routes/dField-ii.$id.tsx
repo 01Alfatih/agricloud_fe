@@ -28,6 +28,8 @@ import { MulaiTanamModal } from '@/components/MulaiTanamModal'
 import { WeatherContent } from '@/components/WeatherCard'
 import { ActiveCycleCard } from '@/components/ActiveCycleCard'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
+
 export const Route = createFileRoute('/dField-ii/$id')({
   component: RouteComponent,
 })
@@ -156,7 +158,7 @@ function RouteComponent() {
     try {
       // Endpoint detail tunggal (lebih efisien dari ambil seluruh list).
       const response = await axios.get<{ data: IfieldResponse }>(
-        `http://localhost:8005/api/myfields/${id}`,
+        `${API_BASE_URL}/myfields/${id}`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         },

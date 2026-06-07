@@ -45,7 +45,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
 }
 
 const STORAGE_KEY = 'preferences'
-const API_BASE_URL = 'http://localhost:8005/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
 
 function readStored(): Preferences {
   if (typeof window === 'undefined') return DEFAULT_PREFERENCES

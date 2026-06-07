@@ -15,7 +15,7 @@ import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 import { emojiForCrop } from '@/lib/crops'
 
-const API_BASE_URL = 'http://localhost:8005/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
 
 // Kontrak yang diharapkan FE — lihat CycleResource backend (GET /api/cycles?field_id=).
 // Semua opsional supaya FE tahan kalau backend belum lengkap.

@@ -88,46 +88,6 @@ function initials(name?: string | null): string {
     .join('')
 }
 
-// Dummy lahan buat preview tampilan card saat data API kosong / belum login.
-const DUMMY_FIELDS: Array<Ifield> = [
-  {
-    id: -1,
-    name: 'Lahan Cabai Brebes',
-    description: 'Tumpang sari cabai merah keriting & kacang tanah',
-    thumbnail: '/cabe1.png',
-    location: { latitude: '-6.8721', longitude: '109.0407' },
-    area: '5 Hektar',
-    owner: { id: 0, name: 'Agung P' },
-    created_at: '',
-    updated_at: '',
-    address: 'Brebes, Jawa Tengah',
-  },
-  {
-    id: -2,
-    name: 'Kebun Anggur Probolinggo',
-    description: 'Kebun anggur varietas import',
-    thumbnail: '/anggur1.png',
-    location: { latitude: '-7.7543', longitude: '113.2159' },
-    area: '3 Hektar',
-    owner: { id: 0, name: 'Agung P' },
-    created_at: '',
-    updated_at: '',
-    address: 'Probolinggo, Jawa Timur',
-  },
-  {
-    id: -3,
-    name: 'Lahan Tomat Malang',
-    description: 'Lahan tomat dataran tinggi',
-    thumbnail: '/tomat1.png',
-    location: { latitude: '-7.9839', longitude: '112.6214' },
-    area: '4 Hektar',
-    owner: { id: 0, name: 'Agung P' },
-    created_at: '',
-    updated_at: '',
-    address: 'Malang, Jawa Timur',
-  },
-]
-
 function FieldCardSkeleton() {
   return (
     <Card className="overflow-hidden border-0 shadow-md dark:border dark:border-white/10 dark:bg-[#15211a]">
@@ -216,11 +176,10 @@ function RouteComponent() {
         }),
       )
 
-      // Kalau API belum ngembaliin lahan, pakai dummy buat preview.
-      setFields(enrichedFields.length > 0 ? enrichedFields : DUMMY_FIELDS)
+      setFields(enrichedFields)
     } catch (error) {
       console.error('Error fetching fields data:', error)
-      setFields(DUMMY_FIELDS)
+      setFields([])
     } finally {
       setLoading(false)
     }
@@ -228,11 +187,6 @@ function RouteComponent() {
 
   // Hapus lahan → DELETE /api/myfields/{id}, lalu refresh list.
   const handleDelete = async (land: Ifield) => {
-    // Lahan dummy preview (id negatif) tidak punya record di backend.
-    if (land.id < 0) {
-      toast.error('Lahan contoh tidak bisa dihapus.')
-      return
-    }
     const ok = window.confirm(
       `Hapus lahan "${land.name}"? Tindakan ini tidak bisa dibatalkan.`,
     )

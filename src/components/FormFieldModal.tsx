@@ -289,15 +289,15 @@ export function FormFieldModal({
       data.append('boundary', JSON.stringify(points.map((p) => [p.lat, p.lng])))
     }
     if (form.thumbnail) data.append('thumbnail', form.thumbnail)
-    // Laravel: spoof method PUT untuk multipart saat edit.
-    if (isEdit) data.append('_method', 'PUT')
 
     setSubmitting(true)
     try {
+      // Backend JS (Hono) TIDAK support method-spoofing `_method` ala-Laravel;
+      // edit harus pakai PUT multipart langsung (kontrak API §2.4).
       const url = isEdit
         ? `${API_BASE_URL}/myfields/${field!.id}`
         : `${API_BASE_URL}/myfields`
-      await axios.post(url, data, {
+      await axios[isEdit ? 'put' : 'post'](url, data, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',

@@ -330,13 +330,13 @@ export function FormWarehouseModal({
     if (lat !== null) data.append('latitude', String(lat))
     if (lng !== null) data.append('longitude', String(lng))
     if (form.thumbnail) data.append('thumbnail', form.thumbnail)
-    // Laravel: spoof method PUT untuk multipart saat edit.
-    if (isEdit) data.append('_method', 'PUT')
 
     setSubmitting(true)
     try {
+      // Backend JS (Hono) TIDAK support method-spoofing `_method` ala-Laravel;
+      // edit harus pakai PUT multipart langsung (kontrak API §4.4).
       const url = isEdit ? `/warehouses/${warehouse.id}` : '/warehouses'
-      await api.post(url, data, {
+      await api[isEdit ? 'put' : 'post'](url, data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       toast.success(isEdit ? 'Gudang diperbarui.' : 'Gudang ditambahkan.')

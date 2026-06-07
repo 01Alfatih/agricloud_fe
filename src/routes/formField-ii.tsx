@@ -26,7 +26,7 @@ import FieldMapPicker, {
 } from '@/components/FieldMapPicker'
 import type { LatLng } from '@/components/FieldMapPicker'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL
 
 export const Route = createFileRoute('/formField-ii')({
   component: RouteComponent,

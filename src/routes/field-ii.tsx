@@ -23,7 +23,7 @@ import type { FieldCrop } from '@/lib/crops'
 import { FormFieldModal } from '@/components/FormFieldModal'
 import type { FieldInitialData } from '@/components/FormFieldModal'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL
 
 export const Route = createFileRoute('/field-ii')({
   component: RouteComponent,

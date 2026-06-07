@@ -28,7 +28,7 @@ import { MulaiTanamModal } from '@/components/MulaiTanamModal'
 import { WeatherContent } from '@/components/WeatherCard'
 import { ActiveCycleCard } from '@/components/ActiveCycleCard'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL
 
 export const Route = createFileRoute('/dField-ii/$id')({
   component: RouteComponent,

@@ -20,7 +20,7 @@ import { Pagination } from '@/components/ui/pagination'
 import { usePagination } from '@/hooks/usePagination'
 import { MulaiTanamModal } from '@/components/MulaiTanamModal'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL
 
 // Halaman "Tanaman Saya": daftar siklus tanam (cycles) MILIK user — bukan katalog
 // crop-templates (itu master data semua jenis tanaman, dipakai di modal Mulai

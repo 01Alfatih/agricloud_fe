@@ -3,7 +3,9 @@
 import { API_BASE_URL } from '@/lib/api'
 
 // Origin backend (tanpa /api) untuk merangkai URL aset (/storage/...).
-const ASSET_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, '')
+// API_BASE_URL bisa undefined kalau VITE_API_URL tak di-set — pakai '' agar
+// tak crash; request tetap gagal terang-terangan, bukan nyasar ke localhost.
+const ASSET_ORIGIN = (API_BASE_URL ?? '').replace(/\/api\/?$/, '')
 
 // Backend memetakan thumbnail dari Storage::url() yang bisa berupa path relatif
 // (`/storage/...`). Rangkai ke origin backend; URL absolut dibiarkan apa adanya.

@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8005/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL
 
 interface ITemplate {
   id: number

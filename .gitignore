@@ -14,3 +14,4 @@ dist-ssr
 client_secret_*.json
 *.apps.googleusercontent.com.json
 *:Zone.Identifier
+.vercel

@@ -26,6 +26,9 @@ import type { LatLng } from '@/components/FieldMapPicker'
 const API_BASE_URL = import.meta.env.VITE_API_URL
 const DEFAULT_CENTER: [number, number] = [-6.2, 106.81] // Jakarta
 
+// Batas luas yang muat di kolom DB backend (numeric(8,2)) ≈ 100 ha.
+const MAX_AREA = 999999.99
+
 // Data lahan untuk mode edit (opsional). Tanpa ini = mode tambah.
 export interface FieldInitialData {
   id: number
@@ -253,6 +256,8 @@ export function FormFieldModal({
     if (!form.area.trim()) next.area = 'Luas lahan wajib diisi.'
     else if (Number.isNaN(Number(form.area)))
       next.area = 'Luas lahan harus berupa angka.'
+    else if (Number(form.area) > MAX_AREA)
+      next.area = `Luas lahan terlalu besar (maks ${MAX_AREA.toLocaleString('id-ID')} m² ≈ 100 ha).`
     // Saat edit, gambar lama boleh dipertahankan.
     if (!form.thumbnail && !existingThumb)
       next.thumbnail = 'Gambar lahan wajib dipilih.'
@@ -307,7 +312,13 @@ export function FormFieldModal({
       onClose()
     } catch (error) {
       console.error('Gagal menyimpan lahan:', error)
-      setSubmitError('Terjadi kesalahan saat menyimpan lahan. Coba lagi.')
+      // Tampilkan pesan validasi backend (422) bila ada, jatuh ke generic.
+      const message =
+        (axios.isAxiosError(error) &&
+          (error.response?.data as { message?: string } | undefined)
+            ?.message) ||
+        'Terjadi kesalahan saat menyimpan lahan. Coba lagi.'
+      setSubmitError(message)
     } finally {
       setSubmitting(false)
     }

@@ -45,6 +45,10 @@ type FieldError = Partial<
 
 const DEFAULT_CENTER: [number, number] = [-6.2, 106.81] // Jakarta
 
+// Batas luas yang muat di kolom DB backend (numeric(8,2)) ≈ 100 ha.
+// Di atas ini backend membalas 422 — validasi di sini biar feedback instan.
+const MAX_AREA = 999999.99
+
 function RouteComponent() {
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -203,6 +207,8 @@ function RouteComponent() {
     if (!form.area.trim()) next.area = 'Luas lahan wajib diisi.'
     else if (Number.isNaN(Number(form.area)))
       next.area = 'Luas lahan harus berupa angka.'
+    else if (Number(form.area) > MAX_AREA)
+      next.area = `Luas lahan terlalu besar (maks ${MAX_AREA.toLocaleString('id-ID')} m² ≈ 100 ha).`
     if (!form.thumbnail) next.thumbnail = 'Gambar lahan wajib dipilih.'
     return next
   }
@@ -241,7 +247,11 @@ function RouteComponent() {
       navigate({ to: '/field' })
     } catch (error) {
       console.error('Gagal mengirim data lahan:', error)
+      // Tampilkan pesan validasi dari backend (422) bila ada, jatuh ke generic.
       const message =
+        (axios.isAxiosError(error) &&
+          (error.response?.data as { message?: string } | undefined)
+            ?.message) ||
         'Terjadi kesalahan saat menyimpan lahan. Coba lagi sebentar.'
       setSubmitError(message)
       toast.error(message)
